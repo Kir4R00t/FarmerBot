@@ -1,0 +1,2 @@
+discord==2.3.2
+dotenv==0.9.9
