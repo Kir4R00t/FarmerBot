@@ -8,12 +8,16 @@ import os
 
 from bot import item_emojis
 
-# Loading intents, bot token & establishing logger
+# Loading intents & bot token
 load_dotenv('.env')
 BOT_TOKEN = os.getenv('DC')
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
-logger = logging.getLogger(__name__)
+
+# Logger stuff
+logger = logging.getLogger("bot")
+logger.setLevel(logging.INFO)
+console_handler = logging.StreamHandler()
 
 
 @bot.event
@@ -68,7 +72,7 @@ async def gibcat(interaction: discord.Interaction):
         await interaction.response.send_message(f"API ERROR: {response.status_code}", ephemeral=False)
 
 # Currency market check
-#  
+
 @bot.tree.command(name="poe2scout", description="Check the current market prices for specified item category")
 @app_commands.describe(category="Select the category of currency")
 @app_commands.choices(category=[

@@ -33,6 +33,7 @@ list = {
     'transmutation-shard': '<:transmutation_shard:1356185270705455195>',
     'transmute': '<:transmutation:1355494366713745468>',
     'fracturing-orb': '<:fracturing_orb:1360707883167383734>',
+    'hinekoras-lock': '<:HinekorasLock:1421976447119265823>',
     
     # Soul
     'soul-core-of-atmohua':'<:Soul_Core_of_Atmohua:1356330777222189187>',
