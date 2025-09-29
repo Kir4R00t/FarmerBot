@@ -12,28 +12,47 @@ list = {
     'etcher': '<:arcanists_etcher:1356180485071441940>',
     'artificers': '<:artificers_orb:1356180614209863730>',
     'artificers-shard': '<:artificers_shard:1356180664013291643>',
-    'aug': '<:augment:1355494457923080222>',
     'chance': '<:chance:1355493353004863488>',
     'chance-shard': '<:chance_shard:1357339212290064597>',
-    'chaos': '<:chaos:1355492533236535366>',
-    'divine': '<:div:1355492390353502388>',
+
+    'transmute': '<:transmutation:1355494366713745468>',
+    'perfect-orb-of-transmutation': '<:transmutation:1355494366713745468>',
+
+    'aug': '<:augment:1355494457923080222>',
+    'greater-orb-of-augmentation': '<:augment:1355494457923080222>',
+    'perfect-orb-of-augmentation': '<:augment:1355494457923080222>',
+
+    'regal': '<:regal:1355494330571165736>',
+    'greater-regal-orb': '<:regal:1355494330571165736>',
+    'perfect-regal-orb': '<:regal:1355494330571165736>',
+
     'exalted': '<:exalt:1355493424207237210>',
+    'greater-exalted-orb': '<:exalt:1355493424207237210>',
+    'perfect-exalted-orb': '<:exalt:1355493424207237210>',
+
+    'chaos': '<:chaos:1355492533236535366>',
+    'greater-chaos-orb': '<:chaos:1355492533236535366>',
+    'perfect-chaos-orb': '<:chaos:1355492533236535366>',
+    
+    "lesser-jewellers-orb": '<:lesser_jewellers_orb:1356180955731329115>',
+    "greater-jewellers-orb": '<:greater_jewellers_orb:1356180894485844009>',
+    "perfect-jewellers-orb": '<:perfect_jewellers_orb:1356181022227697694>',
+
     'gcp': '<:gemcutters_prism:1356180779012587632>',
     'bauble': '<:glassblowers_bauble:1356180826903285825>',
-    "Greater Jeweller's Orb": '<:greater_jewellers_orb:1356180894485844009>',
-    "Lesser Jeweller's Orb": '<:lesser_jewellers_orb:1356180955731329115>',
     'mirror': '<:mirrorr:1355493390401147023>',
-    "Perfect Jeweller's Orb": '<:perfect_jewellers_orb:1356181022227697694>',
-    'regal': '<:regal:1355494330571165736>',
     'scrap': '<:scrap:1356180559076003850>',
     'wisdom': '<:scroll_of_wisdom:1356181080993960088>',
     'vaal': '<:vaal:1355492657375215646>',
     'whetstone': '<:whetstone:1356180728844652567>',
     'regal-shard': '<:regal_shard:1356184910464815225>',
     'transmutation-shard': '<:transmutation_shard:1356185270705455195>',
-    'transmute': '<:transmutation:1355494366713745468>',
+    
     'fracturing-orb': '<:fracturing_orb:1360707883167383734>',
     'hinekoras-lock': '<:HinekorasLock:1421976447119265823>',
+    'divine': '<:div:1355492390353502388>',
+    
+    
     
     # Soul
     'soul-core-of-atmohua':'<:Soul_Core_of_Atmohua:1356330777222189187>',

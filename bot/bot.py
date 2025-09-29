@@ -90,7 +90,7 @@ async def poe2scout(interaction: discord.Interaction, category: app_commands.Cho
     # Get desired category
     selected = category.value
     if selected == "currency":
-        url = 'https://poe2scout.com/api/items/currency/currency'
+        url = 'https://poe2scout.com/api/items/currency/currency?referenceCurrency=exalted&page=1&perPage=25&league=Rise%20Of%20The%20Abyssal'
     elif selected == "soul_cores":
         url = 'https://poe2scout.com/api/items/currency/ultimatum'
     elif selected == "breachstones":
