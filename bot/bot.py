@@ -90,19 +90,11 @@ async def poe2scout(interaction: discord.Interaction, category: app_commands.Cho
         url = 'https://poe2scout.com/api/items/currency/currency?referenceCurrency=exalted&page=1&perPage=25&league=Rise%20Of%20The%20Abyssal'
     elif selected == "soul_cores":
         url = 'https://poe2scout.com/api/items/currency/ultimatum?referenceCurrency=exalted&page=1&perPage=25&league=Rise%20Of%20The%20Abyssal'
-    
-    # Rest needs refractoring
-    '''
-    elif selected == "breachstones":
-        url = 'https://poe2scout.com/api/items/currency/breachcatalyst' 
-    elif selected == "distilled":
-        url = 'https://poe2scout.com/api/items/currency/deliriuminstill'
     elif selected == "essences":
-        url = 'https://poe2scout.com/api/items/currency/essences'            
+        url = 'https://poe2scout.com/api/items/currency/essences?referenceCurrency=exalted&page=1&perPage=25&league=Rise%20Of%20The%20Abyssal' 
     else:
         await interaction.response.send_message("Unknown category.", ephemeral=True)
         return
-    '''
         
     response = requests.get(url)
 

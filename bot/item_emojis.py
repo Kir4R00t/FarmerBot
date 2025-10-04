@@ -133,5 +133,9 @@ list = {
     'greater-essence-of-torment': '<:Greater_Essence_of_Torment:1356360746337833171>',
     'greater-essence-of-the-body': '<:Greater_Essence_of_the_Body:1356360740763865251>',
     'greater-essence-of-the-infinite': '<:Greater_Essence_of_the_Infinite:1356360742604902471>',
-    'greater-essence-of-the-mind': '<:Greater_Essence_of_the_Mind:1356360744538603802> '
+    'greater-essence-of-the-mind': '<:Greater_Essence_of_the_Mind:1356360744538603802>',
+    'essence-of-horror': '<:CorruptedEssenceHorror:1424169131757797416>',
+    'essence-of-hysteria': '<:essenceofhysteria:1424169750199537684>',
+    'essence-of-abyss':'<:essenceofabyss:1424170533272158300>',
+    'essence-of-opulence':''
 }
