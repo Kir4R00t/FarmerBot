@@ -6,7 +6,7 @@
 #
 
 list = {
-    # Currency
+    # Currency -> Basic currencies
     'alch': '<:alchemy:1355494399416471764>',
     'annul': '<:annulment:1355494427501662311>',
     'etcher': '<:arcanists_etcher:1356180485071441940>',
@@ -52,9 +52,8 @@ list = {
     'hinekoras-lock': '<:HinekorasLock:1421976447119265823>',
     'divine': '<:div:1355492390353502388>',
     
-    
-    
-    # Soul
+    # Ultimatum -> Soul cores you drop from trials of chaos
+    # TODO: some of these may be deprecated !
     'soul-core-of-atmohua':'<:Soul_Core_of_Atmohua:1356330777222189187>',
     'soul-core-of-azcapa':'<:Soul_Core_of_Azcapa:1356330778845516006>',
     'soul-core-of-cholotl':'<:Soul_Core_of_Cholotl:1356330780107739366>',
@@ -70,6 +69,19 @@ list = {
     'soul-core-of-xopec':'<:Soul_Core_of_Xopec:1356330692673536152>',
     'soul-core-of-zalatl':'<:Soul_Core_of_Zalatl:1356330693650550920>',
     'soul-core-of-zantipi':'<:Soul_Core_of_Zantipi:1356330662310838423>',
+
+    'citaqualotls-soul-core-of-foulness':'<:citaqualotlssoulcoreoffoulness:1424148759604101411>',
+    'estazuntis-soul-core-of-convalescence':'<:estazuntissoulcoreofconvalescenc:1424148761252462713>',
+    'atmohuas-soul-core-of-retreat':'<:atmohuassoulcoreofretreat:1424148756542132294>',
+    'guatelitzis-soul-core-of-endurance':'<:guatelitzissoulcoreofendurance:1424148762535919806>',
+    'soul-core-of-jiquani':'<:soulcoreofjiquani:1424148804122312726>',
+    'soul-core-of-tacati':'<:soulcoreoftacati:1424148856731336746>',
+    'tzamotos-soul-core-of-ferocity':'<:tzamotossoulcoreofferocity:1424148900154966056>',
+    'quipolatls-soul-core-of-flow':'<:quipolatlssoulcoreofflow:1424148796610314272>',
+    'opilotis-soul-core-of-assault':'<:opilotissoulcoreofassault:1424148764628619425>',
+    'uromotis-soul-core-of-attenuation':'<:uromotissoulcoreofattenuation:1424148902579273931>',
+    'topotantes-soul-core-of-dampening':'<:topotantessoulcoreofdampenin:1424160144241070091>',
+    'xopecs-soul-core-of-power':'<:xopecssoulcoreofpower:1424148931839004702>',
 
     # Breach catalysts
     'skittering-catalyst': '<:Skittering_Catalyst:1356334422189670470>',
