@@ -77,7 +77,7 @@ async def gibcat(interaction: discord.Interaction):
 @app_commands.choices(
     category = [
         app_commands.Choice(name="Currency", value="currency"),
-        app_commands.Choice(name="Soul Cores", value="soul_cores"),
+        app_commands.Choice(name="Soul Cores", value="ultimatum"),
         app_commands.Choice(name="Essences", value="essences")
     ],
     ref_choice = [
