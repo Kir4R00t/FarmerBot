@@ -2,7 +2,6 @@ from dotenv import load_dotenv
 from discord.ext import commands
 from discord import app_commands
 import requests
-import logging
 import discord
 import os
 
@@ -14,12 +13,6 @@ BOT_TOKEN = os.getenv('DC')
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# Logger stuff
-logger = logging.getLogger("bot")
-logger.setLevel(logging.INFO)
-console_handler = logging.StreamHandler()
-
-
 @bot.event
 async def on_ready():
     global guild
@@ -28,22 +21,22 @@ async def on_ready():
             break
 
     # Bot connection info
-    logger.info(
+    print(
         f'{bot.user} is connected to the following guild:\n'
         f'{guild.name}(id: {guild.id})'
     )
 
     # Commands sync
     try:
-        logger.info("Synced commands: \n")
+        print("Synced commands: \n")
         synced = await bot.tree.sync()
         for x in synced:
-            logger.info(f'{x}\n')
+            print(f'{x}\n')
         if synced is None:
-            logger.info(f'{x} is not synced\n')
+            print(f'{x} is not synced\n')
 
     except Exception as error:
-        logger.info(error)
+        print(error)
 
 @bot.event
 async def on_message(message):
@@ -95,9 +88,9 @@ async def poe2scout(interaction: discord.Interaction, category: app_commands.Cho
     # Get desired category and reference currency
     if category.value and ref_choice:
         url = f'https://poe2scout.com/api/items/currency/{category.value}?referenceCurrency={ref_choice.value}&page=1&perPage=25&league=Rise%20Of%20The%20Abyssal'
-        logger.info(f'Successfully made a query with: {url}')
+        print(f'Successfully made a query with: {url}')
     else:
-        logger.info(f'Shit just hit the fan with {url}')
+        print(f'Shit just hit the fan with {url}')
         await interaction.response.send_message("Unknown category or reference currency.", ephemeral=True)
         return
         
@@ -120,6 +113,11 @@ async def poe2scout(interaction: discord.Interaction, category: app_commands.Cho
             if category.value == 'essences':
                 if 'lesser' in item_name or 'greater' in item_name:
                     continue
+            
+            # If there are any missing emojis just log them and skip to next iteration
+            if item_name not in emojis:
+                print(f'Emote missing for {item_name}')
+                continue
 
             item_emoji = emojis[item_name]
             price = line['currentPrice']
@@ -134,7 +132,7 @@ async def poe2scout(interaction: discord.Interaction, category: app_commands.Cho
 
     else:
         await interaction.followup.send('poe2scout API is down', ephemeral=True)
-        logger.warning("Did not get a response ... poe2scout API may be down")
+        print("Did not get a response ... poe2scout API may be down")
 
 def main():
     bot.run(BOT_TOKEN)

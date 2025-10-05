@@ -150,5 +150,6 @@ list = {
     'essence-of-thawing': '<:thawing:1424345303774924860>',
     'essence-of-insulation': '<:insualtion:1424346331471675483>',
     'essence-of-grounding': '<:grounding:1424366046487253022>',
-    'essence-of-alacrity': '<:alacrity:1424374215569703033>' 
+    'essence-of-alacrity': '<:alacrity:1424374215569703033>',
+    'essence-of-seeking': '<:seeking:1424414643639816324>'
 }
