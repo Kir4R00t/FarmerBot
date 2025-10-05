@@ -148,5 +148,7 @@ list = {
     'essence-of-delirium': '<:essenceofdelirium:1424341767964065934>',
     'essence-of-abrasion': '<:essenceofabrasion:1424344475110609068>',
     'essence-of-thawing': '<:thawing:1424345303774924860>',
-    'essence-of-insulation': '<:insualtion:1424346331471675483>'
+    'essence-of-insulation': '<:insualtion:1424346331471675483>',
+    'essence-of-grounding': '<:grounding:1424366046487253022>',
+    'essence-of-alacrity': '<:alacrity:1424374215569703033>' 
 }

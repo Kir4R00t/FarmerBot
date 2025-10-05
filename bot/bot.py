@@ -69,31 +69,36 @@ async def gibcat(interaction: discord.Interaction):
         await interaction.response.send_message(f"API ERROR: {response.status_code}", ephemeral=False)
 
 # Currency market check
-
-@bot.tree.command(name="poe2scout", description="Check the current market prices for specified item category")
-@app_commands.describe(category="Select the category of currency")
-@app_commands.choices(category=[
-    app_commands.Choice(name="Currency", value="currency"),
-    app_commands.Choice(name="Soul Cores", value="soul_cores"),
-    app_commands.Choice(name="Breachstones", value="breachstones"),
-    app_commands.Choice(name="Distilled Emotions", value="distilled"),
-    app_commands.Choice(name="Essences", value="essences")
-
-])
-async def poe2scout(interaction: discord.Interaction, category: app_commands.Choice[str]):
+@bot.tree.command(name="poe2scout", description="Check the current market prices for specified item category and with specified currency reference")
+@app_commands.describe(
+    category="Select the category of currency",
+    ref_choice="Select currency reference"
+)
+@app_commands.choices(
+    category = [
+        app_commands.Choice(name="Currency", value="currency"),
+        app_commands.Choice(name="Soul Cores", value="soul_cores"),
+        app_commands.Choice(name="Essences", value="essences")
+    ],
+    ref_choice = [
+        app_commands.Choice(name="Exalted", value="exalted"),
+        app_commands.Choice(name="Chaos", value="chaos")
+    ]
+)
+async def poe2scout(interaction: discord.Interaction, category: app_commands.Choice[str], ref_choice: app_commands.Choice[str]):
+    # Defer to make sure that bot has enough time to parse data
+    await interaction.response.defer()
+    
     # Load emojis
     emojis = item_emojis.list
 
-    # Get desired category
-    selected = category.value
-    if selected == "currency":
-        url = 'https://poe2scout.com/api/items/currency/currency?referenceCurrency=exalted&page=1&perPage=25&league=Rise%20Of%20The%20Abyssal'
-    elif selected == "soul_cores":
-        url = 'https://poe2scout.com/api/items/currency/ultimatum?referenceCurrency=exalted&page=1&perPage=25&league=Rise%20Of%20The%20Abyssal'
-    elif selected == "essences":
-        url = 'https://poe2scout.com/api/items/currency/essences?referenceCurrency=exalted&page=1&perPage=25&league=Rise%20Of%20The%20Abyssal' 
+    # Get desired category and reference currency
+    if category.value and ref_choice:
+        url = f'https://poe2scout.com/api/items/currency/{category.value}?referenceCurrency={ref_choice.value}&page=1&perPage=25&league=Rise%20Of%20The%20Abyssal'
+        logger.info(f'Successfully made a query with: {url}')
     else:
-        await interaction.response.send_message("Unknown category.", ephemeral=True)
+        logger.info(f'Shit just hit the fan with {url}')
+        await interaction.response.send_message("Unknown category or reference currency.", ephemeral=True)
         return
         
     response = requests.get(url)
@@ -107,12 +112,12 @@ async def poe2scout(interaction: discord.Interaction, category: app_commands.Cho
             color=discord.Color.gold()
         )
 
-        # Load item data & match with emoji
+        # Parse item data & match with emoji
         for line in data['items']:
             item_name = line['apiId']
             
             # Exclude all lesser and greater essences since their price is alwyas very small/irrelevant
-            if selected == 'essences':
+            if category.value == 'essences':
                 if 'lesser' in item_name or 'greater' in item_name:
                     continue
 
@@ -121,14 +126,14 @@ async def poe2scout(interaction: discord.Interaction, category: app_commands.Cho
             
             embed.add_field(
                 name=f"{item_emoji} {item_name}",
-                value=f"price = {round(price, 3)} {emojis['exalted']} ",
+                value=f"price = {round(price, 3)} {emojis[ref_choice.value]} ",
                 inline=True
             )
 
-        await interaction.response.send_message(embed=embed)
-    
+        await interaction.followup.send(embed=embed)
+
     else:
-        await interaction.response.send_message('poe2scout API is down', ephemeral=True)
+        await interaction.followup.send('poe2scout API is down', ephemeral=True)
         logger.warning("Did not get a response ... poe2scout API may be down")
 
 def main():

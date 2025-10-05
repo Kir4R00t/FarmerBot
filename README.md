@@ -7,7 +7,6 @@ Discord bot made 100% in python for [official xfarmerx's discord](https://discor
 
 ## Upcoming features
 - Refractor of all currency categories
-- Adding a way to change base currency equivalent (from exalts to for example chaos)
 
 ## Setting up virtualenv
 #### Windows
