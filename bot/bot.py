@@ -55,11 +55,12 @@ async def gibcat(interaction: discord.Interaction):
         data = response.json()
         cat_photo_url = (data[0]['url'])
         if data:
-            await interaction.response.send_message(cat_photo_url, ephemeral=False)
+            # Posting a url is enough since Discord automatically embeds it automatically
+            await interaction.response.send_message(cat_photo_url, ephemeral=True)
         else:
-            await interaction.response.send_message("No data from API", ephemeral=False)
+            await interaction.response.send_message("No data from API", ephemeral=True)
     else:
-        await interaction.response.send_message(f"API ERROR: {response.status_code}", ephemeral=False)
+        await interaction.response.send_message(f"API ERROR: {response.status_code}", ephemeral=True)
 
 # Currency market check
 @bot.tree.command(name="poe2scout", description="Check the current market prices for specified item category and with specified currency reference")
@@ -114,7 +115,7 @@ async def poe2scout(interaction: discord.Interaction, category: app_commands.Cho
                 if 'lesser' in item_name or 'greater' in item_name:
                     continue
             
-            # If there are any missing emojis just log them and skip to next iteration
+            # If there are any missing emojis just log them and skip to the next iteration
             if item_name not in emojis:
                 print(f'Emote missing for {item_name}')
                 continue
