@@ -110,6 +110,12 @@ async def poe2scout(interaction: discord.Interaction, category: app_commands.Cho
         # Load item data & match with emoji
         for line in data['items']:
             item_name = line['apiId']
+            
+            # Exclude all lesser and greater essences since their price is alwyas very small/irrelevant
+            if selected == 'essences':
+                if 'lesser' in item_name or 'greater' in item_name:
+                    continue
+
             item_emoji = emojis[item_name]
             price = line['currentPrice']
             

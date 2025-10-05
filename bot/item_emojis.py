@@ -4,7 +4,8 @@
 #
 # (List got so big I decided to put it here to make it more readable)
 #
-
+# TODO: some of the emojis/items are deprecated !
+#
 list = {
     # Currency -> Basic currencies
     'alch': '<:alchemy:1355494399416471764>',
@@ -53,7 +54,6 @@ list = {
     'divine': '<:div:1355492390353502388>',
     
     # Ultimatum -> Soul cores you drop from trials of chaos
-    # TODO: some of these may be deprecated !
     'soul-core-of-atmohua':'<:Soul_Core_of_Atmohua:1356330777222189187>',
     'soul-core-of-azcapa':'<:Soul_Core_of_Azcapa:1356330778845516006>',
     'soul-core-of-cholotl':'<:Soul_Core_of_Cholotl:1356330780107739366>',
@@ -136,6 +136,17 @@ list = {
     'greater-essence-of-the-mind': '<:Greater_Essence_of_the_Mind:1356360744538603802>',
     'essence-of-horror': '<:CorruptedEssenceHorror:1424169131757797416>',
     'essence-of-hysteria': '<:essenceofhysteria:1424169750199537684>',
-    'essence-of-abyss':'<:essenceofabyss:1424170533272158300>',
-    'essence-of-opulence':''
+    'essence-of-abyss': '<:essenceofabyss:1424170533272158300>',
+    'essence-of-opulence': '<:essenceofopulence:1424340110849085620>',
+    'perfect-essence-of-battle': '<:perfectessenceofbattle:1424340640992464907>',
+    'perfect-essence-of-abrasion': '<:perfectessenceofabrasion:1424340638165504122>',
+    'perfect-essence-of-electricity': '<:perfectessenceofelectricity:1424340643626487808>',
+    'perfect-essence-of-enhancement': '<:perfectessenceofenhancement:1424340645643812964>',
+    'perfect-essence-of-haste': '<:perfectessenceofhaste:1424340647342641284>',
+    'perfect-essence-of-ice': '<:perfectessenceofice:1424340649775202367>',
+    'perfect-essence-of-seeking': '<:perfectessenceofseeking:1424340652153503754>',
+    'essence-of-delirium': '<:essenceofdelirium:1424341767964065934>',
+    'essence-of-abrasion': '<:essenceofabrasion:1424344475110609068>',
+    'essence-of-thawing': '<:thawing:1424345303774924860>',
+    'essence-of-insulation': '<:insualtion:1424346331471675483>'
 }
