@@ -7,6 +7,7 @@ Discord bot made 100% in python for [official xfarmerx's discord](https://discor
 
 ## Upcoming features
 - Adding rest of currency categories, so far I have basic currency, soul cores & essences
+- Showing difference in currency prices from last market fetch
 
 ## Setting up virtualenv
 #### Windows
