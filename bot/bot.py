@@ -50,9 +50,7 @@ async def on_pricecheck_message(message, interaction: discord.Interaction):
     if message.channel.id == 1336034291427053578: # Point to pricecheck channel
         trade_site_url = 'www.pathofexile.com/trade2/'
         if trade_site_url not in message.content.lower():
-            await message.delete(), interaction.response.send_message(
-                "Message deleted, please include a proper link to poe2 trade website with any pricechecking request - also check pinned message"
-                )
+            await message.delete()
 
 # CATSSS
 @bot.tree.command(name="gibcat", description="Get a random image of a cat :3")
