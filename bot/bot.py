@@ -52,7 +52,7 @@ async def on_message(message):
     if message.channel.id == 1336034291427053578:
         trade_site_url = 'www.pathofexile.com/trade2/'
         if trade_site_url not in message.content.lower():
-            await message.channel.send('Please provide a valid poe2trade side link to yout pricecheck request! - also check pinned messaged')
+            await message.channel.send('Please provide a valid poe2trade side link to your pricecheck request! - also check pinned messaged')
             await message.delete()
 
 
