@@ -38,19 +38,23 @@ async def on_ready():
     except Exception as error:
         print(error)
 
-# Ping
 @bot.event
-async def on_ping_message(message):
+async def on_message(message):
+    # Ignore all bot messages
+    if message.author.bot:
+        return
+
+    # Ping --> simple check if bot is online
     if message.content.lower() == 'ping':
         await message.channel.send('pong')
 
-# Price check message verification
-@bot.event
-async def on_pricecheck_message(message, interaction: discord.Interaction):
-    if message.channel.id == 1336034291427053578: # Point to pricecheck channel
+    # Pricecheck channel message check
+    if message.channel.id == 1336034291427053578:
         trade_site_url = 'www.pathofexile.com/trade2/'
         if trade_site_url not in message.content.lower():
+            await message.channel.send('Please provide a valid poe2trade side link to yout pricecheck request! - also check pinned messaged')
             await message.delete()
+
 
 # CATSSS
 @bot.tree.command(name="gibcat", description="Get a random image of a cat :3")
