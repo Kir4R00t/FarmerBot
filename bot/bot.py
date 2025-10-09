@@ -44,9 +44,10 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    # Ping --> simple check if bot is online
-    if message.content.lower() == 'ping':
-        await message.channel.send('pong')
+    # Ping --> simple check if bot is alive
+    if message.author.id == 419571860041105410: # only reply to msgs from me
+        if message.content.lower() == 'ping':
+            await message.channel.send('pong')
 
     # Pricecheck channel message check
     if message.channel.id == 1336034291427053578:
