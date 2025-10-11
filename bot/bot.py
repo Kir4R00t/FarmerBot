@@ -52,8 +52,8 @@ async def on_message(message):
     # Pricecheck channel message check
     if message.channel.id == 1336034291427053578:
         trade_site_url = 'www.pathofexile.com/trade2/'
-        if trade_site_url not in message.content.lower():
-            await message.channel.send('Please provide a valid poe2trade side link to your pricecheck request! - also check pinned messaged')
+        if trade_site_url not in message.content.lower() or "#🏷︱poe2-price-check" not in message.content.lower():
+            await message.channel.send('Please make sure to mention "#🏷︱poe2-price-check" channel and provide a valid poe2trade side link to your pricecheck request! - also check pinned messaged')
             await message.delete()
 
 
@@ -68,11 +68,14 @@ async def gibcat(interaction: discord.Interaction):
     if response.status_code == 200:
         data = response.json()
         cat_photo_url = (data[0]['url'])
+
         if data:
             # Posting a url is enough since Discord automatically embeds it automatically
             await interaction.response.send_message(cat_photo_url, ephemeral=True)
+        
         else:
             await interaction.response.send_message("No data from API", ephemeral=True)
+    
     else:
         await interaction.response.send_message(f"API ERROR: {response.status_code}", ephemeral=True)
 
