@@ -1,8 +1,8 @@
-from dotenv import load_dotenv
-from discord.ext import commands
-from discord import app_commands
-import requests
-import discord
+from dotenv import load_dotenv # type: ignore
+from discord.ext import commands # type: ignore
+from discord import app_commands # type: ignore
+import requests # type: ignore
+import discord # type: ignore
 import os
 
 from bot import item_emojis
