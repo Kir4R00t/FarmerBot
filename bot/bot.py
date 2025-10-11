@@ -40,20 +40,29 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
+    msg_content = message.content.lower()
+
     # Ignore all bot messages
     if message.author.bot:
         return
 
     # Ping --> simple check if bot is alive
     if message.author.id == 419571860041105410: # only reply to msgs from me
-        if message.content.lower() == 'ping':
+        if msg_content == 'ping':
             await message.channel.send('pong')
 
     # Pricecheck channel message check
-    if message.channel.id == 1336034291427053578:
+    if message.channel.id == 1125145731083292874:
         trade_site_url = 'www.pathofexile.com/trade2/'
-        if trade_site_url not in message.content.lower() or "#🏷︱poe2-price-check" not in message.content.lower():
-            await message.channel.send('Please make sure to mention "#🏷︱poe2-price-check" channel and provide a valid poe2trade side link to your pricecheck request! - also check pinned messaged')
+        if "#🏷︱poe2-price-check" in msg_content and trade_site_url not in msg_content:
+            embed=discord.Embed (
+                title="Your message has been deleted !", 
+                description='Please make sure to mention "#🏷︱poe2-price-check" channel in your message and provide a valid poe2trade side link to make the pricechecking process easier ! ', 
+                color=0xff0000
+                )
+            embed.set_footer(text="Please check pinned messages")
+            
+            await message.channel.send(embed=embed)
             await message.delete()
 
 
