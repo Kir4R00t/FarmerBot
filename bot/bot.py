@@ -52,12 +52,12 @@ async def on_message(message):
             await message.channel.send('pong')
 
     # Pricecheck channel message check
-    if message.channel.id == 1125145731083292874:
+    if message.channel.id == 1336034291427053578:
         trade_site_url = 'www.pathofexile.com/trade2/'
-        if "#🏷︱poe2-price-check" in msg_content and trade_site_url not in msg_content:
+        if "<#1336034291427053578>" in msg_content and trade_site_url not in msg_content:
             embed=discord.Embed (
                 title="Your message has been deleted !", 
-                description='Please make sure to mention "#🏷︱poe2-price-check" channel in your message and provide a valid poe2trade side link to make the pricechecking process easier ! ', 
+                description='Please make sure to mention <#1336034291427053578> channel in your message and provide a valid poe2trade side link to make the pricechecking process easier ! ', 
                 color=0xff0000
                 )
             embed.set_footer(text="Please check pinned messages")
@@ -128,7 +128,7 @@ async def poe2scout(interaction: discord.Interaction, category: app_commands.Cho
   
         embed = discord.Embed(
             title=f"{emojis['divine']} Currency prices {emojis['divine']}",
-            description="Current rates for basic currency. NOTE: data is collected from poe2scout and they collect data every 3hrs",
+            description="Current rates for basic currency. NOTE: data is collected from [poe2scout](https://poe2scout.com/) and they collect data every 3hrs",
             color=discord.Color.gold()
         )
 
