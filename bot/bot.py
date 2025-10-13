@@ -54,7 +54,7 @@ async def on_message(message):
     # Pricecheck channel message check
     if message.channel.id == 1336034291427053578:
         trade_site_url = 'www.pathofexile.com/trade2/'
-        if "<#1336034291427053578>" in msg_content and trade_site_url not in msg_content:
+        if message.attachmets and trade_site_url not in msg_content:
             embed=discord.Embed (
                 title="Your message has been deleted !", 
                 description='Please make sure to mention <#1336034291427053578> channel in your message and provide a valid poe2trade side link to make the pricechecking process easier ! ', 
