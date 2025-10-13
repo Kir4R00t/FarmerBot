@@ -83,7 +83,7 @@ async def gibcat(interaction: discord.Interaction):
             await interaction.response.send_message(cat_photo_url, ephemeral=True)
         
         else:
-            await interaction.response.send_message("No data from API", ephemeral=True)
+            await interaction.response.send_message("No data from API", ephemeral=False)
     
     else:
         await interaction.response.send_message(f"API ERROR: {response.status_code}", ephemeral=True)
