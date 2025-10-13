@@ -57,7 +57,7 @@ async def on_message(message):
         if message.attachmets and trade_site_url not in msg_content:
             embed=discord.Embed (
                 title="Your message has been deleted !", 
-                description='Please make sure to mention <#1336034291427053578> channel in your message and provide a valid poe2trade side link to make the pricechecking process easier ! ', 
+                description='Please make sure to attach a screenshot of your item and to provide a valid poe2trade side link to make the pricechecking process easier ! ', 
                 color=0xff0000
                 )
             embed.set_footer(text="Please check pinned messages")
