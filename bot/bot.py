@@ -79,7 +79,7 @@ async def gibcat(interaction: discord.Interaction):
         cat_photo_url = (data[0]['url'])
 
         if data:
-            # Posting a url is enough since Discord automatically embeds it automatically
+            # Posting a url is enough since Discord automatically embeds it
             await interaction.response.send_message(cat_photo_url, ephemeral=True)
         
         else:
