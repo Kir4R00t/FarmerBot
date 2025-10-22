@@ -112,16 +112,14 @@ async def poe2scout(interaction: discord.Interaction, category: app_commands.Cho
     
     # Load emojis
     emojis = item_emojis.list
-
+    
     # Get desired category and reference currency
-    if category.value and ref_choice:
-        url = f'https://poe2scout.com/api/items/currency/{category.value}?referenceCurrency={ref_choice.value}&page=1&perPage=25&league=Rise%20Of%20The%20Abyssal'
-        print(f'Successfully made a query with: {url}')
-    else:
-        print(f'Shit just hit the fan with {url}')
+    if category.value is None or ref_choice is None:
         await interaction.response.send_message("Unknown category or reference currency.", ephemeral=True)
         return
-        
+    
+    url = f'https://poe2scout.com/api/items/currency/{category.value}?referenceCurrency={ref_choice.value}&page=1&perPage=25&league=Rise%20Of%20The%20Abyssal'
+    
     response = requests.get(url)
 
     if response.status_code == 200:
@@ -132,6 +130,39 @@ async def poe2scout(interaction: discord.Interaction, category: app_commands.Cho
             description="Current rates for basic currency. NOTE: data is collected from [poe2scout](https://poe2scout.com/) and they collect data every 3hrs",
             color=discord.Color.gold()
         )
+
+        # Get divine price from leagues api.
+        leagues_url = 'https://poe2scout.com/api/leagues'
+        league_data_response = requests.get(leagues_url)
+
+        if (league_data_response.status_code != 200):
+            await interaction.followup.send('poe2scout API is down', ephemeral=True)
+            print("Did not get a response ... poe2scout API may be down")
+            return
+
+        league_data_json = league_data_response.json()
+
+        divine_price = 0
+        chaos_divine_price = 0
+        for league in league_data_json:
+            if league['value'] != 'Rise of the Abyssal':
+                continue
+            divine_price = league['divinePrice']
+            chaos_divine_price = league['chaosDivinePrice']
+
+        if divine_price == 0 or chaos_divine_price == 0:
+            await interaction.followup.send('poe2scout is not working right now.', ephemeral=True)
+            print("Poe2scout returned malformed data")
+            return
+        
+        current_div_multiplier = 0
+        if (ref_choice.value == 'exalted'):
+            current_div_multiplier = divine_price
+        elif (ref_choice.value == 'chaos'):
+            current_div_multiplier = chaos_divine_price
+        else:
+            await interaction.followup.send('Farmerbot had a catastrophic failure.', ephemeral=True)
+            raise Exception("No div price for given ref_choice")
 
         # Parse item data & match with emoji
         for line in data['items']:
@@ -149,12 +180,21 @@ async def poe2scout(interaction: discord.Interaction, category: app_commands.Cho
 
             item_emoji = emojis[item_name]
             price = line['currentPrice']
-            
-            embed.add_field(
-                name=f"{item_emoji} {item_name}",
-                value=f"price = {round(price, 3)} {emojis[ref_choice.value]} ",
-                inline=True
-            )
+
+            # If the price is over 1.3 the given multiplier. Price it in div. Else price it to ref_choice
+            if price > (current_div_multiplier * 1.3):
+                div_price = price / current_div_multiplier
+                embed.add_field(
+                    name=f"{item_emoji} {item_name}",
+                    value=f"price = {round(div_price, 3)} {emojis['divine']} ",
+                    inline=True
+                )
+            else:
+                embed.add_field(
+                    name=f"{item_emoji} {item_name}",
+                    value=f"price = {round(price, 3)} {emojis[ref_choice.value]} ",
+                    inline=True
+                )
 
         await interaction.followup.send(embed=embed)
 
