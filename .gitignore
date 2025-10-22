@@ -2,3 +2,4 @@
 .venv
 .venv-win
 test.py
+__pycache__
