@@ -10,9 +10,18 @@ Discord bot made 100% in python for [official xfarmerx's discord](https://discor
 ## Upcoming features
 - Adding rest of currency categories, so far I have basic currency, soul cores & essences
 - Showing difference in currency prices from last market fetch
-- Create an option to use more currencies as price references (?) - or at least add divs
 
-## Setting up virtualenv
+## Contributing
+If you wish to contribute to the project please follow these general steps:
+1. Fork the repository on github.
+2. Clone your forked repository to your local machine. `git clone <forked_repo_url>`
+3. Create a new branch `git checkout -b feature/your-feature-name`
+4. Make your changes.
+5. Commit your changes `git commit -m 'Added feature X'`
+6. Push to the branch `git push origin feature/your-feature-name`.
+7. Open a pull request
+
+## Setting up local development enviorment
 #### Windows
 ```python -m venv .venv```<br>
 ```pip install -r requirements.txt```<br>
@@ -20,9 +29,11 @@ Discord bot made 100% in python for [official xfarmerx's discord](https://discor
 
 #### Linux
 ```python3 -m venv .venv```<br>
+```source .venv/bin/activate```<br>
 ```pip install -r requirements.txt```<br>
 
-```source .venv/bin/activate```
-
 ## Docker deployment
-```docker compose up -d --build```
+```docker compose up --build```
+
+## License
+This project is licensed under the MIT license
