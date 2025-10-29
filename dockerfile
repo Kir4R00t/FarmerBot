@@ -29,4 +29,4 @@ COPY bot ./bot
 USER appuser
 
 # Default command (run the bot)
-CMD ["python", "-m", "bot.bot"]
+CMD ["python", "-m", "bot.main"]
