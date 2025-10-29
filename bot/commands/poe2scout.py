@@ -3,7 +3,7 @@ from discord import app_commands # type: ignore
 import requests # type: ignore
 import discord # type: ignore
 
-from util import item_emojis
+from bot.util import item_emojis
 
 class CurrencyExchange():
     def __init__(self, client: commands.Bot):
