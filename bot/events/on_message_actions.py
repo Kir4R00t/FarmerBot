@@ -11,19 +11,22 @@ class OnMessageActions():
         async def on_message(message):
             msg_content = message.content.lower()
             msg_mention = message.author.mention
+            
+            bot_dev_id = 419571860041105410 # My discord UUID
+            price_check_channel_id = 1336034291427053578
+            trade_site_url = 'www.pathofexile.com/trade2/'
 
             # Ignore all bot messages
             if message.author.bot:
                 return
 
             # Ping --> simple check if bot is alive
-            if message.author.id == 419571860041105410: # only reply to msgs from me
+            if message.author.id == bot_dev_id:
                 if msg_content == 'ping':
                     await message.channel.send('pong')
 
             # Pricecheck channel message check
-            if message.channel.id == 1336034291427053578:
-                trade_site_url = 'www.pathofexile.com/trade2/'
+            if message.channel.id == price_check_channel_id:
                 if message.attachments and trade_site_url not in msg_content:
                     embed=discord.Embed (
                         title="Your message was deleted!", 
