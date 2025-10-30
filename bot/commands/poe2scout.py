@@ -70,7 +70,8 @@ class CurrencyExchange():
         for itemdata in item_list['items']:
             # Extract item data, calculate price change
             item_name = itemdata['apiId']
-            if item_name == ref_choice: continue # skip ref currency
+            
+            if item_name == ref_choice.value: continue # skip ref currency
             
             item_emoji = self.emojis[item_name]
             price = itemdata['currentPrice']
