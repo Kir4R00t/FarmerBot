@@ -75,10 +75,14 @@ class CurrencyExchange():
             item_emoji = self.emojis[item_name]
             price = itemdata['currentPrice']
             
-            # Get price change
-            new_price = itemdata['priceLogs'][0]['price']
-            old_price = itemdata['priceLogs'][1]['price']
-            price_change = self.calculate_price_change(new_price, old_price)
+            try:
+                # Get price change
+                new_price = itemdata['priceLogs'][0]['price']
+                old_price = itemdata['priceLogs'][1]['price']
+                price_change = self.calculate_price_change(new_price, old_price)
+
+            except TypeError:
+                price_change = " --- "
 
             # Exclude all lesser and greater essences since their price is alwyas very small/irrelevant
             if category.value == 'essences':
@@ -88,7 +92,7 @@ class CurrencyExchange():
             # If there are any missing emojis just log them and skip to the next iteration
             if item_name not in self.emojis:
                 print(f'Emote missing for {item_name}')
-                return
+                continue
             
             # If the price is over 1.3 the given multiplier. Price it in div. Else price it to ref_choice
             current_div_multiplier = self.calculate_div_multiplier(ref_choice)
