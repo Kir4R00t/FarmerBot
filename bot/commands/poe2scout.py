@@ -11,15 +11,22 @@ class CurrencyExchange():
         self.emojis = item_emojis.list
         self.market_command()
 
-    def calculate_price_change(self, price_new: float, price_old: float) -> float:
-        price_change = (price_old / price_new) * 100
-
-        if price_change < 100.00: 
-            price_change = f"{round(price_change - 100.00, 2)} %"
-        else:
-            price_change = f"{round(100.00 - price_change, 2)} %" 
+    def calculate_price_change(self, price_new: float, price_old: float) -> str:
+        price_change = round((price_old / price_new) * 100, 2)
         
-        return price_change
+        if price_change > 100.0:
+            price_change = f"{round(price_change - 100.00, 2)} %"
+            price_change_emoji = self.emojis['red-down']
+        elif price_change < 100.0:
+            price_change = f"{round(100.00 - price_change, 2)} %" 
+            price_change_emoji = self.emojis['green-up']
+        elif price_change == 100.0:
+            price_change = f"0%"
+            price_change_emoji = ':zero:'
+        else:
+            raise Exception
+
+        return f"{price_change_emoji} {price_change}"
 
     def calculate_div_multiplier(self, ref_choice: str) -> float:
         # Get divine price from leagues api.
@@ -63,12 +70,15 @@ class CurrencyExchange():
         for itemdata in item_list['items']:
             # Extract item data, calculate price change
             item_name = itemdata['apiId']
+            if item_name == ref_choice: continue # skip ref currency
+            
             item_emoji = self.emojis[item_name]
             price = itemdata['currentPrice']
             
+            # Get price change
             new_price = itemdata['priceLogs'][0]['price']
             old_price = itemdata['priceLogs'][1]['price']
-            price_change = self.calculate_price_change(new_price, old_price)    
+            price_change = self.calculate_price_change(new_price, old_price)
 
             # Exclude all lesser and greater essences since their price is alwyas very small/irrelevant
             if category.value == 'essences':
@@ -86,13 +96,13 @@ class CurrencyExchange():
                 div_price = price / current_div_multiplier
                 embed.add_field(
                     name=f"{item_emoji} {item_name}",
-                    value=f"price = {round(div_price, 3)} {self.emojis['divine']} {price_change}",
+                    value=f"{round(div_price, 2)} {self.emojis['divine']} {price_change}",
                     inline=True
                 )
             else:
                 embed.add_field(
                     name=f"{item_emoji} {item_name}",
-                    value=f"price = {round(price, 3)} {self.emojis[ref_choice.value]} {price_change}",
+                    value=f"{round(price, 2)} {self.emojis[ref_choice.value]} {price_change}",
                     inline=True
                 )
             

@@ -7,6 +7,10 @@
 # TODO: some of the emojis/items are deprecated !
 #
 list = {
+    # Util
+    'green-up': '<:green_up:1433480841299755128>',
+    'red-down': '<:red_arrow:1433480821163163838>',
+
     # Currency -> Basic currencies
     'alch': '<:alchemy:1355494399416471764>',
     'annul': '<:annulment:1355494427501662311>',
