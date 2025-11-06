@@ -13,7 +13,8 @@ class OnMessageActions():
             msg_mention = message.author.mention
             
             bot_dev_id = 419571860041105410 # My discord UUID
-            price_check_channel_id = 1336034291427053578
+            poe2_price_check_channel_id = 1336034291427053578
+            poe1_price_check_channel_id = 1382141426103750736
             trade_site_url = 'www.pathofexile.com/trade2/'
 
             # Ignore all bot messages
@@ -26,7 +27,7 @@ class OnMessageActions():
                     await message.channel.send('pong')
 
             # Pricecheck channel message check
-            if message.channel.id == price_check_channel_id:
+            if message.channel.id == poe2_price_check_channel_id or message.channel.id == poe1_price_check_channel_id:
                 if message.attachments and trade_site_url not in msg_content:
                     embed=discord.Embed (
                         title="Your message was deleted!", 
