@@ -139,7 +139,7 @@ class CurrencyExchange():
                 await interaction.response.send_message("Unknown category or reference currency.", ephemeral=True)
                 return
             
-            url = f'https://poe2scout.com/api/items/currency/{category.value}?referenceCurrency={ref_choice.value}&page=1&perPage=25&league=Rise%20Of%20The%20Abyssal'
+            url = f'https://poe2scout.com/api/items/currency/{category.value}?referenceCurrency={ref_choice.value}&page=1&perPage=25&league=Fate%20of%20the%20Vaal'
             response = requests.get(url)
 
             if response.status_code == 200:
