@@ -42,7 +42,7 @@ class CurrencyExchange():
         divine_price = 0
         chaos_divine_price = 0
         for league in league_data_json:
-            if league['value'] != 'Rise of the Abyssal':
+            if league['value'] != 'Fate of the Vaal':
                 continue
             divine_price = league['divinePrice']
             chaos_divine_price = league['chaosDivinePrice']
