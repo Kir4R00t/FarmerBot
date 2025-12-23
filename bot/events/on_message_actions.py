@@ -34,7 +34,7 @@ class OnMessageActions():
                 if message.attachments and poe2_trade_site_url not in msg_content:
                     embed=discord.Embed (
                         title="Your message was deleted!", 
-                        description=f'{msg_mention} Please provide a valid trade link + screenshot of your item to get a price check.', 
+                        description=f'{msg_mention} Please provide a valid trade link + screenshot of your item to get a price check, you can watch this guide on price checking: https://www.youtube.com/watch?v=lIG76Vh4p-E', 
                         color=0xff0000
                         )
                     embed.set_footer(text="See pinned message.")
