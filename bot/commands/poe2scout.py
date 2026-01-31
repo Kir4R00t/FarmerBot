@@ -63,17 +63,20 @@ class CurrencyExchange():
     def create_embed(self, item_list: dict, category: str, ref_choice: str) -> discord.Embed:
         current_div_multiplier = self.calculate_div_multiplier(ref_choice)
         
+        # First pass: collect all items and find max name length
         items_data = []
         max_name_length = 0
         
         for itemdata in item_list['items']:
+            # Extract item data, calculate price change
             item_name = itemdata['apiId']
             
-            if item_name == ref_choice.value: continue
+            if item_name == ref_choice.value: continue # skip ref currency
             
             price = itemdata['currentPrice']
             
             try:
+                # Get price change
                 new_price = itemdata['priceLogs'][0]['price']
                 old_price = itemdata['priceLogs'][1]['price']
                 price_change_value = round((old_price / new_price) * 100, 2)
@@ -90,15 +93,18 @@ class CurrencyExchange():
             except (TypeError, IndexError, KeyError):
                 price_change_text = "---"
                 price_change_emoji = ""
-
+            
+            # Exclude all lesser and greater essences since their price is alwyas very small/irrelevant
             if category.value == 'essences':
                 if 'lesser' in item_name or 'greater' in item_name:
                     continue
             
+            # If there are any missing emojis just log them and skip to the next iteration
             if item_name not in self.emojis:
                 print(f'Emote missing for {item_name}')
                 continue
             
+            # If the price is over 1.3 the given multiplier. Price it in div. Else price it to ref_choice
             if price > (current_div_multiplier * 1.3):
                 div_price = price / current_div_multiplier
                 price_str = f"{round(div_price, 2)}"
@@ -120,6 +126,7 @@ class CurrencyExchange():
                 'change_text': price_change_text
             })
         
+        # Second pass: format with consistent alignment
         max_price_length = max(len(item['price']) for item in items_data)
         
         all_items = []
