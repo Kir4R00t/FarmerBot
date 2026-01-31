@@ -61,11 +61,11 @@ class CurrencyExchange():
         return current_div_multiplier
 
     def create_embed(self, item_list: dict, category: str, ref_choice: str) -> discord.Embed:
-        embed = discord.Embed(
-            title=f"{self.emojis['divine']} Currency prices {self.emojis['divine']}",
-            description="Current rates for basic currency. NOTE: data is collected from [poe2scout](https://poe2scout.com/) and they collect data every few hours",
-            color=discord.Color.gold()
-        )
+        current_div_multiplier = self.calculate_div_multiplier(ref_choice)
+        
+        # First pass: collect all items and find max name length
+        items_data = []
+        max_name_length = 0
         
         for itemdata in item_list['items']:
             # Extract item data, calculate price change
@@ -73,22 +73,31 @@ class CurrencyExchange():
             
             if item_name == ref_choice.value: continue # skip ref currency
             
-            item_emoji = self.emojis[item_name]
             price = itemdata['currentPrice']
             
             try:
                 # Get price change
                 new_price = itemdata['priceLogs'][0]['price']
                 old_price = itemdata['priceLogs'][1]['price']
-                price_change = self.calculate_price_change(new_price, old_price)
-
-            except TypeError:
-                price_change = " --- "
-
+                price_change_value = round((old_price / new_price) * 100, 2)
+                
+                if price_change_value > 100.0:
+                    price_change_text = f"{round(price_change_value - 100.00, 2)}%"
+                    price_change_emoji = self.emojis['red-down']
+                elif price_change_value < 100.0:
+                    price_change_text = f"{round(100.00 - price_change_value, 2)}%"
+                    price_change_emoji = self.emojis['green-up']
+                else:
+                    price_change_text = "0%"
+                    price_change_emoji = "="
+            except (TypeError, IndexError, KeyError):
+                price_change_text = "---"
+                price_change_emoji = ""
+            
             # Exclude all lesser and greater essences since their price is alwyas very small/irrelevant
             if category.value == 'essences':
                 if 'lesser' in item_name or 'greater' in item_name:
-                    return
+                    continue
             
             # If there are any missing emojis just log them and skip to the next iteration
             if item_name not in self.emojis:
@@ -96,20 +105,49 @@ class CurrencyExchange():
                 continue
             
             # If the price is over 1.3 the given multiplier. Price it in div. Else price it to ref_choice
-            current_div_multiplier = self.calculate_div_multiplier(ref_choice)
             if price > (current_div_multiplier * 1.3):
                 div_price = price / current_div_multiplier
-                embed.add_field(
-                    name=f"{item_emoji} {item_name}",
-                    value=f"{round(div_price, 2)} {self.emojis['divine']} {price_change}",
-                    inline=True
-                )
+                price_str = f"{round(div_price, 2)}"
+                price_emoji = self.emojis['divine']
             else:
-                embed.add_field(
-                    name=f"{item_emoji} {item_name}",
-                    value=f"{round(price, 2)} {self.emojis[ref_choice.value]} {price_change}",
-                    inline=True
-                )
+                price_str = f"{round(price, 2)}"
+                price_emoji = self.emojis[ref_choice.value]
+            
+            item_emoji = self.emojis.get(item_name, '')
+            name_display = item_name.replace('-', ' ')
+            max_name_length = max(max_name_length, len(name_display))
+            
+            items_data.append({
+                'emoji': item_emoji,
+                'name': name_display,
+                'price': price_str,
+                'price_emoji': price_emoji,
+                'change_emoji': price_change_emoji,
+                'change_text': price_change_text
+            })
+        
+        # Second pass: format with consistent alignment
+        max_price_length = max(len(item['price']) for item in items_data)
+        
+        all_items = []
+        for item in items_data:
+            name_padded = item['name'].ljust(max_name_length)
+            price_padded = item['price'].rjust(max_price_length)
+            line = f"{item['emoji']} `{name_padded}  {price_padded}` {item['price_emoji']} {item['change_emoji']} `{item['change_text']}`"
+            all_items.append(line)
+        
+        description_text = "\n".join(all_items)
+        
+        embed = discord.Embed(
+            title=f"{self.emojis['divine']} Currency Prices {self.emojis['divine']}",
+            description=description_text,
+            color=discord.Color.gold()
+        )
+        
+        total_items = len(all_items)
+        shown_items = total_items
+        
+        embed.set_footer(text=f"Showing {shown_items} of {total_items} items • Data from poe2scout.com")
             
         return embed
 
