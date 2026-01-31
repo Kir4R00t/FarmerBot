@@ -147,7 +147,11 @@ class CurrencyExchange():
         total_items = len(all_items)
         shown_items = total_items
         
-        embed.set_footer(text=f"Showing {shown_items} of {total_items} items • Data from poe2scout.com")
+        mirror_img_url = "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lEdXBsaWNhdGUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/26bc31680e/CurrencyDuplicate.png"
+        embed.set_footer(
+                text =      f"Showing {shown_items} of {total_items} fetched items • Data extracted from poe2scout.com",
+                icon_url =  mirror_img_url             
+            )
             
         return embed
 
