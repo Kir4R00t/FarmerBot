@@ -164,9 +164,18 @@ class CurrencyExchange():
         )
         @app_commands.choices(
             category = [
-                app_commands.Choice(name="Currency", value="currency"),
-                app_commands.Choice(name="Soul Cores", value="ultimatum"),
-                app_commands.Choice(name="Essences", value="essences")
+                app_commands.Choice(name="Currency",            value="currency"),
+                app_commands.Choice(name="Soul Cores",          value="ultimatum"),
+                app_commands.Choice(name="Essences",            value="essences"),
+                app_commands.Choice(name="Delirium",            value="delirium"),
+                app_commands.Choice(name="Breach",              value="breach"),
+                app_commands.Choice(name="Fragments",           value="fragments"),
+                app_commands.Choice(name="Uncut Gems",          value="uncutgems"),
+                app_commands.Choice(name="Runes",               value="runes"),
+                app_commands.Choice(name="Idols",               value="idols"),
+                app_commands.Choice(name="Lineage Supports",    value="runes"),
+                app_commands.Choice(name="Abyss",               value="abyss"),
+                app_commands.Choice(name="Reliquary keys",      value="vaultkeys")
             ],
             ref_choice = [
                 app_commands.Choice(name="Exalted", value="exalted"),
