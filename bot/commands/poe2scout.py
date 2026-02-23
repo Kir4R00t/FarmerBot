@@ -90,7 +90,8 @@ class CurrencyExchange():
                 else:
                     price_change_text = "0%"
                     price_change_emoji = "="
-            except (TypeError, IndexError, KeyError):
+            except (TypeError, IndexError, KeyError) as e:
+                print(f"Exception while calculating the price: {e}")
                 price_change_text = "---"
                 price_change_emoji = ""
             
