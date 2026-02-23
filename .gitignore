@@ -5,3 +5,5 @@ test.py
 __pycache__
 icons
 test.json
+item_emojis.json
+item_emojis.py
