@@ -173,7 +173,7 @@ class CurrencyExchange():
                 app_commands.Choice(name="Uncut Gems",          value="uncutgems"),
                 app_commands.Choice(name="Runes",               value="runes"),
                 app_commands.Choice(name="Idols",               value="idols"),
-                app_commands.Choice(name="Lineage Supports",    value="runes"),
+                app_commands.Choice(name="Lineage Supports",    value="lineagesupportgems"),
                 app_commands.Choice(name="Abyss",               value="abyss"),
                 app_commands.Choice(name="Reliquary keys",      value="vaultkeys")
             ],
