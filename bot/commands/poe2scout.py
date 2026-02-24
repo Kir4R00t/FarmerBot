@@ -2,8 +2,12 @@ from discord.ext import commands # type: ignore
 from discord import app_commands # type: ignore
 import requests # type: ignore
 import discord # type: ignore
+import logging
 
 from bot.util import item_emojis
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class CurrencyExchange():
     def __init__(self, client: commands.Bot):
@@ -26,6 +30,7 @@ class CurrencyExchange():
         else:
             raise Exception
 
+        logger.debug(f"Price change calculated: {price_change_emoji} {price_change}")
         return f"{price_change_emoji} {price_change}"
 
     def calculate_div_multiplier(self, ref_choice: str) -> float:
@@ -34,7 +39,7 @@ class CurrencyExchange():
         league_data_response = requests.get(leagues_url)
 
         if (league_data_response.status_code != 200):
-            print("Did not get a response ... poe2scout API may be down")
+            logger.warning("Did not get a response ... poe2scout API may be down")
             return
 
         league_data_json = league_data_response.json()
@@ -48,7 +53,7 @@ class CurrencyExchange():
             chaos_divine_price = league['chaosDivinePrice']
 
         if divine_price == 0 or chaos_divine_price == 0:
-            print("Poe2scout returned malformed data")
+            logger.warning("Poe2scout returned malformed data")
             return
         
         if (ref_choice.value == 'exalted'):
@@ -58,6 +63,7 @@ class CurrencyExchange():
         else:
             raise Exception("No div price for given ref_choice")
 
+        logger.debug(f"Div multiplier calculated: {current_div_multiplier}")
         return current_div_multiplier
 
     def create_embed(self, item_list: dict, category: str, ref_choice: str) -> discord.Embed:
@@ -91,7 +97,7 @@ class CurrencyExchange():
                     price_change_text = "0%"
                     price_change_emoji = "="
             except (TypeError, IndexError, KeyError) as e:
-                print(f"Exception while calculating the price: {e}")
+                logger.error(f"Exception while calculating the price: {e}")
                 price_change_text = "---"
                 price_change_emoji = ""
             
@@ -102,7 +108,7 @@ class CurrencyExchange():
             
             # If there are any missing emojis just log them and skip to the next iteration
             if item_name not in self.emojis:
-                print(f'Emote missing for {item_name}')
+                logger.warning(f'Emote missing for {item_name}')
                 continue
             
             # If the price is over 1.3 the given multiplier. Price it in div. Else price it to ref_choice
@@ -153,7 +159,7 @@ class CurrencyExchange():
                 text =      f"Showing {shown_items} of {total_items} fetched items • Data extracted from poe2scout.com",
                 icon_url =  mirror_img_url             
             )
-            
+        
         return embed
 
     def market_command(self):
@@ -197,9 +203,11 @@ class CurrencyExchange():
             if response.status_code == 200:
                 data = response.json()
                 embed = self.create_embed(data, category, ref_choice)
-
+                
+                logger.info("Embed has been sent")
                 await interaction.followup.send(embed=embed)
 
             else:
+                logger.warning("Did not get a response ... poe2scout API may be down")
                 await interaction.followup.send('poe2scout API is down', ephemeral=True)
-                print("Did not get a response ... poe2scout API may be down")
+                

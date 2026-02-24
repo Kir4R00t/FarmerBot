@@ -1,4 +1,8 @@
 from discord.ext import commands # type: ignore
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class OnReady():
     def __init__(self, client: commands.Bot):
@@ -14,19 +18,18 @@ class OnReady():
                     break
 
             # Bot connection info
-            print(
-                f'{self.client.user} is connected to the following guild:\n'
-                f'{guild.name}(id: {guild.id})'
+            logger.info(
+                "%s is connected to guild: %s (id=%s)",
+                self.client.user, guild.name, guild.id
             )
 
             # Commands sync
             try:
-                print("Synced commands: \n")
+                logger.info("Synced commands: \n")
                 synced = await self.client.tree.sync()
-                for x in synced:
-                    print(f'{x}\n')
-                if synced is None:
-                    print(f'{x} is not synced\n')
+                logger.info("Synced %d commands:\n%s",
+                            len(synced),
+                            "\n".join(f"- {cmd.name} ({cmd.type})" for cmd in synced))
 
-            except Exception as error:
-                print(error)
+            except Exception as e:
+                logger.ERROR(e)
