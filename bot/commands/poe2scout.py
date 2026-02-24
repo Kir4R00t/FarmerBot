@@ -140,7 +140,7 @@ class CurrencyExchange():
         description_text = "\n".join(all_items)
         
         embed = discord.Embed(
-            title=f"{self.emojis['divine']} Currency Prices {self.emojis['divine']}",
+            title=f"{self.emojis['divine']} {category.name} Pricing {self.emojis['divine']}",
             description=description_text,
             color=discord.Color.gold()
         )
