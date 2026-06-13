@@ -35,7 +35,7 @@ class CurrencyExchange():
 
     def calculate_div_multiplier(self, ref_choice: str) -> float:
         # Get divine price from leagues api.
-        leagues_url = 'https://poe2scout.com/api/leagues'
+        leagues_url = 'https://poe2scout.com/api/poe2/Leagues'
         league_data_response = requests.get(leagues_url)
 
         if (league_data_response.status_code != 200):
@@ -47,10 +47,10 @@ class CurrencyExchange():
         divine_price = 0
         chaos_divine_price = 0
         for league in league_data_json:
-            if league['value'] != 'Fate of the Vaal':
+            if league['Value'] != 'Runes of Aldur':
                 continue
-            divine_price = league['divinePrice']
-            chaos_divine_price = league['chaosDivinePrice']
+            divine_price = league['DivinePrice']
+            chaos_divine_price = league['ChaosDivinePrice']
 
         if divine_price == 0 or chaos_divine_price == 0:
             logger.warning("Poe2scout returned malformed data")
@@ -73,13 +73,13 @@ class CurrencyExchange():
         items_data = []
         max_name_length = 0
         
-        for itemdata in item_list['items']:
+        for itemdata in item_list['Items']:
             # Extract item data, calculate price change
-            item_name = itemdata['apiId']
+            item_name = itemdata['ApiId']
             
             if item_name == ref_choice.value: continue # skip ref currency
             
-            price = itemdata['currentPrice']
+            price = itemdata['CurrentPrice']
             
             try:
                 # Get price change
@@ -197,7 +197,7 @@ class CurrencyExchange():
                 await interaction.response.send_message("Unknown category or reference currency.", ephemeral=True)
                 return
             
-            url = f'https://poe2scout.com/api/items/currency/{category.value}?referenceCurrency={ref_choice.value}&page=1&perPage=25&league=Fate%20of%20the%20Vaal'
+            url = f'https://poe2scout.com/api/poe2/Leagues/Runes%20of%20Aldur/Currencies/ByCategory?Category={category.value}&ReferenceCurrency={ref_choice.value}'
             response = requests.get(url)
 
             if response.status_code == 200:
