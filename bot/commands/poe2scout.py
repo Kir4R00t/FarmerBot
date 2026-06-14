@@ -83,8 +83,8 @@ class CurrencyExchange():
             
             try:
                 # Get price change
-                new_price = itemdata['priceLogs'][0]['price']
-                old_price = itemdata['priceLogs'][1]['price']
+                new_price = itemdata['PriceLogs'][0]['Price']
+                old_price = itemdata['PriceLogs'][1]['Price']
                 price_change_value = round((old_price / new_price) * 100, 2)
                 
                 if price_change_value > 100.0:
