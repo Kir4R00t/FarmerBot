@@ -3,8 +3,9 @@ Discord bot and data engineering project made in Python for
 [official xfarmerx's discord](https://discord.com/invite/bsjQV4tFMf).
 
 The project ingests Path of Exile 2 market data, stores historical snapshots in
-PostgreSQL, exposes analytics through Discord slash commands, and includes a
-foundation for Airflow-based orchestration.
+PostgreSQL, exposes analytics through Discord slash commands
+
+(and includes a foundation for Airflow-based orchestration)
 
 ## Available Commands & Features
 ```/poe2scout <currency_type> <reference_currency>``` - Queries poe2scout.com for recent currency prices.<br>
@@ -15,7 +16,7 @@ foundation for Airflow-based orchestration.
 
 ```#Pricecheck request validator``` - If anyone asks for a pricecheck on their item and will not provide a valid link to poe2trade site to item with similar attributes, the message will be deleted and followed up by bot's message.
 
-## Data Engineering Features
+## Data Engineering stuff
 - Python ETL pipeline for poe2scout API ingestion
 - PostgreSQL raw, dimension, fact and mart layers
 - Historical price snapshots and normalized poe2scout price logs
@@ -24,9 +25,9 @@ foundation for Airflow-based orchestration.
 - Docker Compose stack with PostgreSQL
 - Airflow DAG entry point in `orchestration/airflow/dags`
 
-## Upcoming Features
-- Airflow deployment profile
-- Kafka/event-driven alerts for price thresholds
+## Upcoming Features (maybe lol)
+- Airflow deployment profile (nerd shit)
+- Kafka/event-driven alerts for price thresholds (also nerd shit)
 - Creating links with queries for a given item to make price checking easier
 
 ## Setting Up Local Development Environment
@@ -57,8 +58,8 @@ PostgreSQL is not exposed on a host port. It is reachable only by services in
 the Docker Compose network.
 
 ## VPS Deployment Notes
-On a VPS, keep `postgres` without a `ports` section. To inspect the database,
-SSH into the server and open `psql` inside the container:
+You do not want to get hacked so on your VPS keep `postgres` without a `ports` section.
+To inspect the db, SSH into the server and open `psql` inside the container:
 
 ```bash
 ssh user@your-vps
@@ -68,7 +69,7 @@ docker compose exec postgres psql -U farmerbot -d farmerbot
 
 If you changed `POSTGRES_USER` or `POSTGRES_DB`, use those values instead.
 
-Do not open port `5432` in your firewall.
+Do **NOT** open port `5432` in your firewall.
 
 ## Running Market Ingestion
 Start PostgreSQL and the bot stack:

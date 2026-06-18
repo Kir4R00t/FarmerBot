@@ -1,5 +1,7 @@
 from decimal import Decimal
+from dotenv import load_dotenv
 import logging
+import os
 
 from discord import app_commands
 from discord.ext import commands
@@ -37,13 +39,20 @@ class MarketAnalytics:
         self.client = client
         self.settings = load_settings()
         self.repository = MarketRepository(self.settings.database_url)
+        
+        load_dotenv('.env')
+        self.bot_dev_id = int(os.getenv('DEV_ID', '0'))
         self.register_commands()
+    
+    def is_dev(self, interaction: discord.Interaction) -> bool:
+        return interaction.user.id == self.bot_dev_id
 
     def register_commands(self):
         @self.client.tree.command(
             name="etlstatus",
             description="Show recent market ETL pipeline runs",
         )
+        @app_commands.check(self.is_dev)
         async def etlstatus(interaction: discord.Interaction):
             await interaction.response.defer(ephemeral=True)
             try:
@@ -195,6 +204,7 @@ class MarketAnalytics:
 def _format_price(value: Decimal | None) -> str:
     if value is None:
         return "n/a"
+    
     return f"{value:.4f}".rstrip("0").rstrip(".")
 
 
@@ -202,4 +212,5 @@ def _format_change(value: Decimal | None) -> str:
     if value is None:
         return "n/a"
     sign = "+" if value > 0 else ""
+    
     return f"{sign}{value}%"
