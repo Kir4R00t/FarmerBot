@@ -1,7 +1,10 @@
 .env
 .venv
 .venv-win
+.pytest_cache
+.ruff_cache
 test.py
+*.pyc
 __pycache__
 icons
 test.json

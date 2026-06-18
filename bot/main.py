@@ -3,7 +3,7 @@ from discord.ext import commands    # type: ignore
 import discord                      # type: ignore
 import os
 
-from bot.commands import poe2scout, catAPI
+from bot.commands import poe2scout, catAPI, market_analytics
 from bot.events import on_message_actions, on_ready
 
 class BotApp():
@@ -18,6 +18,7 @@ class BotApp():
         # Initalize bot modules
         poe2scout.CurrencyExchange(self.bot)
         catAPI.CatApi(self.bot)
+        market_analytics.MarketAnalytics(self.bot)
         on_message_actions.OnMessageActions(self.bot)
         on_ready.OnReady(self.bot)
     
