@@ -5,10 +5,9 @@ import os
 
 class OnMessageActions():
     def __init__(self, client: commands.Bot):
-        self.client = client
         load_dotenv('.env')
-        self.dev_id = os.getenv('DEV_ID')
-
+        self.dev_id = int(os.getenv('DEV_ID'))
+        self.client = client
         self.eventListener()
 
     def eventListener(self):
@@ -16,8 +15,6 @@ class OnMessageActions():
         async def on_message(message):
             msg_content = message.content.lower()
             msg_mention = message.author.mention
-            
-            self.dev_id = 419571860041105410 # My discord UUID
 
             poe2_price_check_channel_id = 1336034291427053578
             poe2_trade_site_url = 'www.pathofexile.com/trade2/'
@@ -29,7 +26,7 @@ class OnMessageActions():
             if message.author.bot:
                 return
 
-            # Ping --> simple check if bot is alive
+            # Simple check if bot is alive
             if message.author.id == self.dev_id:
                 if msg_content == 'ping':
                     await message.channel.send('pong')
