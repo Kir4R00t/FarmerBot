@@ -17,8 +17,6 @@ class OnMessageActions():
             msg_content = message.content.lower()
             msg_mention = message.author.mention
             
-            self.dev_id = 419571860041105410 # My discord UUID
-
             poe2_price_check_channel_id = 1336034291427053578
             poe2_trade_site_url = 'www.pathofexile.com/trade2/'
 
