@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 # "https://api.poe2scout.com/poe2/Leagues/Runes%20of%20Aldur/Items/PriceHistory"
+# Add one-time "fake edit" to stop the message from jumping
 
 def create_menu_embed() -> discord.Embed:
     return discord.Embed(
