@@ -2,7 +2,7 @@
 ## Bot commands
 ### # poe2scout 
 To retrieve data about current currency market prices I use 
-[poe2scout.com's website free API](https://poe2scout.com/api/swagger#/) <br>
+[poe2scout.com's website free API](https://api.poe2scout.com/swagger/index.html/) <br>
 
 When it comes to making good looking embeds to nicely display all desired currency prices all I had to do was create empty discord servers just to add emojis (it's a workaround for emoji limit of 50 for free servers) because the bot can use all emojis that it has access to on any server it's on.
 
