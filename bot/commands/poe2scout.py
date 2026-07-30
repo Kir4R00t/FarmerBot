@@ -151,12 +151,9 @@ class CurrencyExchange():
             color=discord.Color.gold()
         )
         
-        total_items = len(all_items)
-        shown_items = total_items
-        
         mirror_img_url = "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lEdXBsaWNhdGUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/26bc31680e/CurrencyDuplicate.png"
         embed.set_footer(
-                text =      f"Showing {shown_items} of {total_items} fetched items • Data extracted from poe2scout.com",
+                text =      f"Price change vs. 1 hour ago • Data extracted from poe2scout.com",
                 icon_url =  mirror_img_url             
             )
         
@@ -197,7 +194,7 @@ class CurrencyExchange():
                 await interaction.response.send_message("Unknown category or reference currency.", ephemeral=True)
                 return
             
-            url = f'https://poe2scout.com/api/poe2/Leagues/Runes%20of%20Aldur/Currencies/ByCategory?Category={category.value}&ReferenceCurrency={ref_choice.value}'
+            url = f'https://poe2scout.com/api/poe2/Leagues/Runes%20of%20Aldur/Currencies/ByCategory?Category={category.value}&ReferenceCurrency={ref_choice.value}&frequencyHours=1'
             response = requests.get(url)
 
             if response.status_code == 200:
