@@ -4,6 +4,7 @@ from discord import app_commands # type: ignore
 import requests # type: ignore
 import discord # type: ignore
 import os
+import asyncio
 
 class CatApi():
     def __init__(self, client: commands.Bot):
@@ -16,19 +17,22 @@ class CatApi():
             load_dotenv('.env')
             api_key = os.getenv('CAT_API')
             url = f"https://api.thecatapi.com/v1/images/search?&api_key={api_key}"
-            response = requests.get(url)
+            try:
+                response = await asyncio.to_thread(requests.get, url, timeout=10)
+            except requests.RequestException:
+                await interaction.response.send_message("Cat API is unavailable.", ephemeral=True)
+                return
 
             if response.status_code == 200:
                 data = response.json()
-                cat_photo_url = (data[0]['url'])
 
                 if data:
                     # Posting a url is enough since Discord automatically embeds it
-                    await interaction.response.send_message(cat_photo_url, ephemeral=True)
-                
+                    await interaction.response.send_message(data[0]['url'], ephemeral=True)
+
                 else:
                     await interaction.response.send_message("No data from API", ephemeral=False)
-            
+
             else:
                 await interaction.response.send_message(f"API ERROR: {response.status_code}", ephemeral=True)
-                    
+

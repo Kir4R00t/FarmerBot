@@ -17,15 +17,16 @@ from bot.services.r2_snapshot_reader import (
     SnapshotConfigurationError,
     SnapshotReaderError,
 )
-from bot.util import item_emojis
+from bot.util.emoji_loader import load_item_emojis
+from bot.services.market_movers import Direction, ItemKind, rank_market_movers
 
 
 logger = logging.getLogger(__name__)
 
-CATEGORY_PAGE_SIZE = 20
+CATEGORY_PAGE_SIZE = 15
 ITEM_PAGE_SIZE = 15
 REFERENCE_CURRENCIES = ("exalted", "chaos", "divine")
-EMOJIS: dict[str, str] = getattr(item_emojis, "list", {})
+EMOJIS: dict[str, str] = load_item_emojis()
 
 CATEGORY_LABELS = {
     "lineagesupportgems": "Lineage Supports",
@@ -198,6 +199,13 @@ def _item_emoji(record: dict[str, Any]) -> str:
     return next((EMOJIS[key] for key in candidates if key in EMOJIS), "•")
 
 
+def _table_item_name(record: dict[str, Any], max_length: int = 40) -> str:
+    """Keep names on one line and prevent them from breaking inline code."""
+    name = _text(record.get("name")) or _text(record.get("api_id")).replace("-", " ")
+    name = " ".join(name.replace("`", "'").split()) or "Unknown"
+    return name if len(name) <= max_length else name[:max_length - 1] + "…"
+
+
 def _currency_marker(reference_currency: str) -> str:
     return EMOJIS.get(reference_currency, reference_currency.title())
 
@@ -352,6 +360,7 @@ def create_menu_embed(
         description=(
             "Choose an item category below. The currency buttons change the "
             "reference used for every displayed price.\n\n"
+            "Use **Top Gainers** or **Top Losers** to compare market snapshots.\n\n"
             f"**Reference:** {_currency_marker(reference_currency)} "
             f"{reference_currency.title()}\n"
             f"**Categories found:** {len(groups)}\n"
@@ -404,7 +413,6 @@ def create_category_embed(
     total_pages = max(1, math.ceil(len(current_records) / ITEM_PAGE_SIZE))
     item_page = min(max(item_page, 0), total_pages - 1)
     start = item_page * ITEM_PAGE_SIZE
-    visible_records = current_records[start : start + ITEM_PAGE_SIZE]
 
     previous_index = (
         _index_records(snapshots[1].records) if len(snapshots) > 1 else {}
@@ -415,9 +423,9 @@ def create_category_embed(
         if len(snapshots) > 1
         else None
     )
-    lines: list[str] = []
-
-    for record in visible_records:
+    # Measure the entire category so columns remain stable between pages.
+    rows = []
+    for record in current_records:
         raw_price = _number(record.get("current_price"))
         if raw_price is None:
             continue
@@ -426,6 +434,17 @@ def create_category_embed(
             reference_currency,
             multiplier,
         )
+        rows.append((
+            record, raw_price, display_price, display_currency,
+            _table_item_name(record), _format_price(display_price),
+        ))
+    name_width = max((len(row[4]) for row in rows), default=0)
+    price_width = max((len(row[5]) for row in rows), default=0)
+    lines: list[str] = []
+
+    for (
+        record, raw_price, display_price, display_currency, item_name, price_text
+    ) in rows[start : start + ITEM_PAGE_SIZE]:
         previous = previous_index.get(_record_identity(record))
         previous_raw_price = (
             _number(previous.get("current_price")) if previous else None
@@ -452,7 +471,7 @@ def create_category_embed(
         )
 
         if change is None:
-            change_display = "`change —`"
+            change_display = "— `---`"
         elif change > 0.005:
             change_display = (
                 f"{EMOJIS.get('green-up', '▲')} `+{change:.2f}%`"
@@ -462,21 +481,18 @@ def create_category_embed(
                 f"{EMOJIS.get('red-down', '▼')} `{change:.2f}%`"
             )
         else:
-            change_display = "`0.00%`"
+            change_display = "= `0.00%`"
 
-        item_name = _text(record.get("name")) or _text(record.get("api_id"))
-        item_name = discord.utils.escape_markdown(item_name[:100] or "Unknown")
         lines.append(
-            f"{_item_emoji(record)} **{item_name}** — "
-            f"`{_format_price(display_price)}` "
-            f"{_currency_marker(display_currency)} · {change_display}"
+            f"{_item_emoji(record)} `{item_name:<{name_width}}  {price_text:>{price_width}}` "
+            f"{_currency_marker(display_currency)} {change_display}"
         )
 
     if not lines:
         lines.append("No priced items were found for this category and reference.")
 
     embed = discord.Embed(
-        title=f"{group.label} Prices",
+        title=f"{_currency_marker('divine')} {group.label} Pricing {_currency_marker('divine')}",
         description="\n".join(lines),
         color=discord.Color.gold(),
         timestamp=latest.captured_at,
@@ -608,6 +624,180 @@ class ReferenceCurrencyButton(discord.ui.Button):
             await view.change_reference(interaction, self.reference_currency)
 
 
+def _mover_change_text(change: float) -> str:
+    return f"{change:+.3g}%" if abs(change) >= 1_000_000 else f"{change:+.2f}%"
+
+
+def create_movers_embed(
+    snapshots: Sequence[ExchangeSnapshot],
+    reference_currency: str,
+    direction: Direction,
+    item_kind: ItemKind,
+    item_page: int,
+) -> tuple[discord.Embed, int, int]:
+    movers = rank_market_movers(
+        snapshots, reference_currency, direction=direction, item_kind=item_kind,
+    )
+    total_pages = max(1, math.ceil(len(movers) / ITEM_PAGE_SIZE))
+    item_page = min(max(item_page, 0), total_pages - 1)
+    start = item_page * ITEM_PAGE_SIZE
+    rows = []
+    for mover in movers:
+        quantity = mover.quantity
+        quantity_text = (
+            "—" if quantity is None else
+            f"{quantity:,}" if quantity < 1_000_000_000 else f"{quantity:.3g}"
+        )
+        rows.append((
+            mover, _table_item_name(mover.record, max_length=28),
+            _format_price(mover.current_price), _mover_change_text(mover.change_percent),
+            quantity_text,
+        ))
+    name_width = max([len("Item"), *(len(row[1]) for row in rows)])
+    price_width = max([len("Price"), *(len(row[2]) for row in rows)])
+    change_width = max([len("Change"), *(len(row[3]) for row in rows)])
+    quantity_width = max([len("Qty"), *(len(row[4]) for row in rows)])
+    lines = [
+        f"▫️ `{'Item':<{name_width}}  {'Price':>{price_width}}  "
+        f"{'Change':>{change_width}}  {'Qty':>{quantity_width}}`"
+    ]
+    arrow = EMOJIS.get("green-up", "▲") if direction == "gainers" else EMOJIS.get("red-down", "▼")
+    for mover, name, price, change, quantity in rows[start:start + ITEM_PAGE_SIZE]:
+        lines.append(
+            f"{_item_emoji(mover.record)} `{name:<{name_width}}  {price:>{price_width}}  "
+            f"{change:>{change_width}}  {quantity:>{quantity_width}}` {arrow}"
+        )
+    if not movers:
+        lines = [
+            "A second, older snapshot is needed to compare prices."
+            if len(snapshots) < 2 or snapshots[0].captured_at <= snapshots[1].captured_at
+            else f"No {direction} with comparable prices were found for this item type and reference."
+        ]
+    latest = snapshots[0]
+    embed = discord.Embed(
+        title=f"Top {direction.title()} • {'Currency items' if item_kind == 'currency' else 'Uniques'}",
+        description="\n".join(lines), color=discord.Color.gold(), timestamp=latest.captured_at,
+    )
+    embed.add_field(
+        name="Price and change reference",
+        value=f"{_currency_marker(reference_currency)} {reference_currency.title()}", inline=True,
+    )
+    embed.add_field(
+        name="Qty",
+        value="Recorded current quantity; traded volume is not available in these snapshots.",
+        inline=False,
+    )
+    comparison = "Unavailable until a second, older snapshot is stored"
+    if len(snapshots) > 1:
+        comparison = (
+            f"{_format_timestamp(snapshots[1].captured_at)} → {_format_timestamp(latest.captured_at)}\n"
+            f"Collection interval: {_format_duration((latest.captured_at - snapshots[1].captured_at).total_seconds())}"
+        )
+    embed.add_field(name="Comparison", value=comparison, inline=False)
+    embed.add_field(
+        name="Data staleness",
+        value=(f"Snapshot: {_format_duration((datetime.now(timezone.utc) - latest.captured_at).total_seconds())} old\n"
+               + _staleness_summary((mover.record for mover in movers), latest.captured_at)),
+        inline=False,
+    )
+    first = start + 1 if movers else 0
+    last = min(start + ITEM_PAGE_SIZE, len(movers))
+    embed.set_footer(text=(
+        f"Items {first}–{last} of {len(movers)} • Page {item_page + 1}/{total_pages} • "
+        "No minimum quantity filter • Data from poe2scout.com"
+    ))
+    return embed, item_page, total_pages
+
+
+class OpenMoversButton(discord.ui.Button):
+    def __init__(self, direction: Direction, *, disabled: bool) -> None:
+        super().__init__(
+            label=f"Top {direction.title()}", style=discord.ButtonStyle.primary,
+            row=3, disabled=disabled, custom_id=f"market:open:{direction}",
+        )
+        self.direction = direction
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        if isinstance(self.view, CategoryMenuView):
+            await self.view.show_movers(interaction, self.direction)
+
+
+class MoversButton(discord.ui.Button):
+    def __init__(
+        self, label: str, setting: str, value: str | int, *, row: int,
+        disabled: bool = False, selected: bool = False,
+    ) -> None:
+        super().__init__(
+            label=label, row=row, disabled=disabled or selected,
+            style=discord.ButtonStyle.primary if selected else discord.ButtonStyle.secondary,
+            custom_id=f"market:movers:{setting}:{value}",
+        )
+        self.setting = setting
+        self.value = value
+
+    async def callback(self, interaction: discord.Interaction) -> None:
+        if isinstance(self.view, MarketMoversView):
+            await self.view.navigate(interaction, self.setting, self.value)
+
+
+class MarketMoversView(OwnedView):
+    def __init__(
+        self, owner_id: int, snapshots: Sequence[ExchangeSnapshot], reference_currency: str,
+        *, direction: Direction = "gainers", item_kind: ItemKind = "currency",
+        item_page: int = 0, category_page: int = 0,
+    ) -> None:
+        super().__init__(owner_id)
+        self.snapshots = tuple(snapshots)
+        self.reference_currency = reference_currency
+        self.direction = direction
+        self.item_kind = item_kind
+        self.category_page = category_page
+        movers = rank_market_movers(
+            self.snapshots, reference_currency, direction=direction, item_kind=item_kind,
+        )
+        self.total_pages = max(1, math.ceil(len(movers) / ITEM_PAGE_SIZE))
+        self.item_page = min(max(item_page, 0), self.total_pages - 1)
+        self.add_item(MoversButton("Categories", "back", "", row=0))
+        self.add_item(MoversButton("◀", "item_page", self.item_page - 1, row=0, disabled=self.item_page == 0))
+        self.add_item(discord.ui.Button(label=f"{self.item_page + 1}/{self.total_pages}", row=0, disabled=True))
+        self.add_item(MoversButton("▶", "item_page", self.item_page + 1, row=0, disabled=self.item_page == self.total_pages - 1))
+        for choice in ("gainers", "losers"):
+            self.add_item(MoversButton(f"Top {choice.title()}", "direction", choice, row=1, selected=choice == direction))
+        for choice, label in (("currency", "Currency items"), ("unique", "Uniques")):
+            self.add_item(MoversButton(label, "item_kind", choice, row=1, selected=choice == item_kind))
+        available = available_reference_currencies(self.snapshots[0].records)
+        if len(self.snapshots) > 1:
+            available &= available_reference_currencies(self.snapshots[1].records)
+        for reference in REFERENCE_CURRENCIES:
+            self.add_item(MoversButton(
+                reference.title(), "reference_currency", reference, row=2,
+                selected=reference == reference_currency, disabled=reference not in available,
+            ))
+
+    def create_embed(self) -> discord.Embed:
+        embed, self.item_page, _ = create_movers_embed(
+            self.snapshots, self.reference_currency, self.direction, self.item_kind, self.item_page,
+        )
+        return embed
+
+    async def navigate(
+        self, interaction: discord.Interaction, setting: str, value: str | int,
+    ) -> None:
+        if setting == "back":
+            view = CategoryMenuView(
+                self.owner_id, self.snapshots, self.reference_currency, category_page=self.category_page,
+            )
+        else:
+            settings = dict(direction=self.direction, item_kind=self.item_kind,
+                            reference_currency=self.reference_currency, item_page=0)
+            settings[setting] = value
+            view = MarketMoversView(
+                self.owner_id, self.snapshots, category_page=self.category_page, **settings,
+            )
+        self.stop()
+        await interaction.response.edit_message(embed=view.create_embed(), view=view)
+
+
 class CategoryMenuView(OwnedView):
     def __init__(
         self,
@@ -641,6 +831,9 @@ class CategoryMenuView(OwnedView):
                     index=start + local_index,
                 )
             )
+
+        for direction in ("gainers", "losers"):
+            self.add_item(OpenMoversButton(direction, disabled=len(self.snapshots) < 2))
 
         self.add_item(
             CategoryPageButton(-1, disabled=self.category_page == 0)
@@ -707,6 +900,16 @@ class CategoryMenuView(OwnedView):
             group,
             self.reference_currency,
             category_page=self.category_page,
+        )
+        self.stop()
+        await interaction.response.edit_message(embed=view.create_embed(), view=view)
+
+    async def show_movers(
+        self, interaction: discord.Interaction, direction: Direction,
+    ) -> None:
+        view = MarketMoversView(
+            self.owner_id, self.snapshots, self.reference_currency,
+            direction=direction, category_page=self.category_page,
         )
         self.stop()
         await interaction.response.edit_message(embed=view.create_embed(), view=view)
@@ -849,7 +1052,7 @@ class PaginationTest:
     def register_command(self) -> None:
         @self.client.tree.command(
             name="market-menu",
-            description="Browse PoE2 market snapshot prices by category",
+            description="Browse PoE2 prices, top gainers, and top losers",
         )
         async def market_menu(
             interaction: discord.Interaction,

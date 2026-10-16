@@ -1,0 +1,15 @@
+[run]
+branch = True
+source = bot
+data_file = reports/.coverage
+
+[report]
+show_missing = True
+precision = 2
+include_namespace_packages = True
+
+[html]
+directory = reports/coverage
+
+[xml]
+output = reports/coverage.xml

@@ -1,0 +1,1 @@
+"""FarmerBot offline behavior tests."""
