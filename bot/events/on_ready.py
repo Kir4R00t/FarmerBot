@@ -12,16 +12,11 @@ class OnReady():
     def ready_event(self):
         @self.client.event
         async def on_ready():
-            global guild
             for guild in self.client.guilds:
-                if guild.name == guild:
-                    break
-
-            # Bot connection info
-            logger.info(
-                "%s is connected to guild: %s (id=%s)",
-                self.client.user, guild.name, guild.id
-            )
+                logger.info(
+                    "%s is connected to guild: %s (id=%s)",
+                    self.client.user, guild.name, guild.id
+                )
 
             # Commands sync
             try:
@@ -32,4 +27,4 @@ class OnReady():
                             "\n".join(f"- {cmd.name} ({cmd.type})" for cmd in synced))
 
             except Exception as e:
-                logger.ERROR(e)
+                logger.exception("Could not sync commands: %s", e)

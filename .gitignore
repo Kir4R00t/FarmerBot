@@ -1,9 +1,44 @@
+# Local configuration and credentials
 .env
-.venv
-.venv-win
-test.py
-__pycache__
-icons
-test.json
-item_emojis.json
-item_emojis.py
+.env.*
+!.env.example
+!.env.*.example
+/.aws/
+
+# Local agent state (keep shared AGENTS.md instructions versioned)
+/.agents/
+/.codex/
+
+# Python environments and generated files
+.venv/
+.venv-*/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+/build/
+/dist/
+
+# Tests, coverage, and tool caches
+/reports/
+.coverage
+.coverage.*
+/coverage.xml
+/htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Generated downloads and scratch output
+/icons/
+/output.json
+*.log
+
+# Editor and operating-system files
+/.idea/
+/.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db

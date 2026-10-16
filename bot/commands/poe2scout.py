@@ -3,8 +3,10 @@ from discord import app_commands # type: ignore
 import requests # type: ignore
 import discord # type: ignore
 import logging
+import asyncio
+import math
 
-from bot.util import item_emojis
+from bot.util.emoji_loader import load_item_emojis
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -12,31 +14,27 @@ logger = logging.getLogger(__name__)
 class CurrencyExchange():
     def __init__(self, client: commands.Bot):
         self.client = client
-        self.emojis = item_emojis.list
+        self.emojis = load_item_emojis()
         self.market_command()
 
     def calculate_price_change(self, price_new: float, price_old: float) -> str:
-        price_change = round((price_old / price_new) * 100, 2)
-        
-        if price_change > 100.0:
-            price_change = f"{round(price_change - 100.00, 2)} %"
-            price_change_emoji = self.emojis['red-down']
-        elif price_change < 100.0:
-            price_change = f"{round(100.00 - price_change, 2)} %" 
-            price_change_emoji = self.emojis['green-up']
-        elif price_change == 100.0:
-            price_change = f"0%"
-            price_change_emoji = ':zero:'
-        else:
-            raise Exception
-
-        logger.debug(f"Price change calculated: {price_change_emoji} {price_change}")
-        return f"{price_change_emoji} {price_change}"
+        try:
+            new, old = float(price_new), float(price_old)
+        except (TypeError, ValueError):
+            return "---"
+        if not math.isfinite(new) or not math.isfinite(old) or new < 0 or old <= 0:
+            return "---"
+        change = round((new - old) / old * 100, 2)
+        if change > 0:
+            return f"{self.emojis['green-up']} {change}%"
+        if change < 0:
+            return f"{self.emojis['red-down']} {abs(change)}%"
+        return ":zero: 0%"
 
     def calculate_div_multiplier(self, ref_choice: str) -> float:
         # Get divine price from leagues api.
         leagues_url = 'https://poe2scout.com/api/poe2/Leagues'
-        league_data_response = requests.get(leagues_url)
+        league_data_response = requests.get(leagues_url, timeout=10)
 
         if (league_data_response.status_code != 200):
             logger.warning("Did not get a response ... poe2scout API may be down")
@@ -68,6 +66,8 @@ class CurrencyExchange():
 
     def create_embed(self, item_list: dict, category: str, ref_choice: str) -> discord.Embed:
         current_div_multiplier = self.calculate_div_multiplier(ref_choice)
+        if current_div_multiplier is None:
+            raise ValueError("Poe2scout API returned no divine exchange rate")
         
         # First pass: collect all items and find max name length
         items_data = []
@@ -85,17 +85,8 @@ class CurrencyExchange():
                 # Get price change
                 new_price = itemdata['PriceLogs'][0]['Price']
                 old_price = itemdata['PriceLogs'][1]['Price']
-                price_change_value = round((old_price / new_price) * 100, 2)
-                
-                if price_change_value > 100.0:
-                    price_change_text = f"{round(price_change_value - 100.00, 2)}%"
-                    price_change_emoji = self.emojis['red-down']
-                elif price_change_value < 100.0:
-                    price_change_text = f"{round(100.00 - price_change_value, 2)}%"
-                    price_change_emoji = self.emojis['green-up']
-                else:
-                    price_change_text = "0%"
-                    price_change_emoji = "="
+                price_change_text = self.calculate_price_change(new_price, old_price)
+                price_change_emoji = ""
             except (TypeError, IndexError, KeyError) as e:
                 logger.error(f"Exception while calculating the price: {e}")
                 price_change_text = "---"
@@ -134,7 +125,7 @@ class CurrencyExchange():
             })
         
         # Second pass: format with consistent alignment
-        max_price_length = max(len(item['price']) for item in items_data)
+        max_price_length = max((len(item['price']) for item in items_data), default=0)
         
         all_items = []
         for item in items_data:
@@ -143,7 +134,7 @@ class CurrencyExchange():
             line = f"{item['emoji']} `{name_padded}  {price_padded}` {item['price_emoji']} {item['change_emoji']} `{item['change_text']}`"
             all_items.append(line)
         
-        description_text = "\n".join(all_items)
+        description_text = "\n".join(all_items) or "No prices available for this category."
         
         embed = discord.Embed(
             title=f"{self.emojis['divine']} {category.name} Pricing {self.emojis['divine']}",
@@ -151,12 +142,9 @@ class CurrencyExchange():
             color=discord.Color.gold()
         )
         
-        total_items = len(all_items)
-        shown_items = total_items
-        
         mirror_img_url = "https://web.poecdn.com//gen/image/WzI1LDE0LHsiZiI6IjJESXRlbXMvQ3VycmVuY3kvQ3VycmVuY3lEdXBsaWNhdGUiLCJzY2FsZSI6MSwicmVhbG0iOiJwb2UyIn1d/26bc31680e/CurrencyDuplicate.png"
         embed.set_footer(
-                text =      f"Showing {shown_items} of {total_items} fetched items • Data extracted from poe2scout.com",
+                text =      f"Price change vs. 1 hour ago • Data extracted from poe2scout.com",
                 icon_url =  mirror_img_url             
             )
         
@@ -193,21 +181,24 @@ class CurrencyExchange():
             await interaction.response.defer()
             
             # Get desired category and reference currency
-            if category.value is None or ref_choice is None:
-                await interaction.response.send_message("Unknown category or reference currency.", ephemeral=True)
+            if category is None or category.value is None or ref_choice is None:
+                await interaction.followup.send("Unknown category or reference currency.", ephemeral=True)
                 return
             
-            url = f'https://poe2scout.com/api/poe2/Leagues/Runes%20of%20Aldur/Currencies/ByCategory?Category={category.value}&ReferenceCurrency={ref_choice.value}'
-            response = requests.get(url)
+            url = f'https://poe2scout.com/api/poe2/Leagues/Runes%20of%20Aldur/Currencies/ByCategory?Category={category.value}&ReferenceCurrency={ref_choice.value}&frequencyHours=1'
+            try:
+                response = await asyncio.to_thread(requests.get, url, timeout=10)
+                if response.status_code == 200:
+                    data = response.json()
+                    embed = await asyncio.to_thread(self.create_embed, data, category, ref_choice)
+                else:
+                    await interaction.followup.send('poe2scout API is down', ephemeral=True)
+                    return
+            except (requests.RequestException, ValueError):
+                logger.exception("Could not retrieve poe2scout prices")
+                await interaction.followup.send('poe2scout API is unavailable', ephemeral=True)
+                return
 
-            if response.status_code == 200:
-                data = response.json()
-                embed = self.create_embed(data, category, ref_choice)
-                
-                logger.info("Embed has been sent")
-                await interaction.followup.send(embed=embed)
-
-            else:
-                logger.warning("Did not get a response ... poe2scout API may be down")
-                await interaction.followup.send('poe2scout API is down', ephemeral=True)
+            await interaction.followup.send(embed=embed)
+            logger.info("Embed has been sent")
                 
