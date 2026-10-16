@@ -98,6 +98,18 @@ Before committing, review `git status --short`, `git diff`, and `git diff --cach
 
 Fork the repository, create a feature branch, make focused changes, run the offline checks, and open a pull request.
 
+## Terms and privacy
+
+- [Terms of Service](TERMS_OF_SERVICE.md)
+- [Privacy Policy](PRIVACY_POLICY.md)
+
+For Discord verification, publish these files in a public repository and enter their
+full GitHub file URLs in the application’s **General Information → Terms of Service
+URL / Privacy Policy URL** fields. Open both links while signed out to confirm they
+are accessible. GitHub Pages is optional. Review the support contact and deployed
+host’s logging practices before publishing; the policy describes the current code
+and does not promise an automatic log-retention limit.
+
 ## License
 
 [MIT](LICENSE).

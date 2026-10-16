@@ -3,6 +3,8 @@
 Updated: 2026-10-16
 
 ## Current focus
+Added `TERMS_OF_SERVICE.md` and `PRIVACY_POLICY.md` for Discord verification, with README links and publishing guidance. Checked current handlers, intents, API requests, in-memory menu ownership, and startup/error logging. Policies use the existing README support server; operator should confirm that contact route and hosting log practices before publication. Files are local only; no push, deployment, or portal changes. Documentation link checks and `git diff --check` passed; no behavioral tests needed for documentation changes.
+
 Expanded `/market-menu` with top gainers and top losers. Arbitrage is out of scope for now. Real snapshot findings remain in `SNAPSHOT_INSPECTION.md`.
 
 ## Established facts
