@@ -61,6 +61,28 @@ Startup connects to Discord, registers event handlers, and syncs slash commands 
 
 Emoji mappings are versioned in `bot/util/item_emojis.json`; restart the bot after editing them.
 
+## Checking missing item emojis
+
+Compare a league's complete PoE2Scout item catalogue with the shared emoji mapping:
+
+```bash
+python3 tools/audit_item_emojis.py --league "Runes of Aldur"
+```
+
+The script uses the current documented API host and saves missing keys, names,
+categories, and icon URLs to `reports/missing-item-emojis.json` (ignored by Git).
+It makes no Discord changes and requires no bot token or additional dependencies.
+Use `--input path/to/items.json` to compare a saved `/Items` response offline,
+or `--output path/to/report.json` to choose another report destination.
+
+The comparison follows `/market-menu` lookup: API ID, then slugged item name.
+Missing mappings can include old items, renamed identifiers, and uniques; they
+are not necessarily new league additions. The audit does not verify that mapped
+Discord emojis still exist. Upload any needed icons to Discord, add their actual
+emoji references under the reported keys in `bot/util/item_emojis.json`, then
+restart/redeploy the bot. The legacy `/poe2scout` command skips unmapped items and
+logs `Emote missing for ...`; the market menu shows a bullet instead.
+
 ## Docker
 
 With `.env` configured:

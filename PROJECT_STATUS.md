@@ -3,6 +3,8 @@
 Updated: 2026-10-16
 
 ## Current focus
+Added `tools/audit_item_emojis.py` (stdlib only): fetch an explicitly named league's `/Items` catalogue or audit saved JSON; compare API IDs/name slugs and output missing keys/categories/icon URLs. No Discord changes. Live Runes of Aldur check: 1,288 items, 1,031 missing category/key mappings (566 with API IDs); includes older items and uniques, not just league additions. Report: ignored `reports/missing-item-emojis.json`. Website `/api/...` URLs returned HTML; current documented host is `https://api.poe2scout.com` without `/api`. Legacy bot endpoint was not changed. All 79 offline tests passed (including three new audit tests); bot coverage remains 99.85%, with the existing defensive skip at pagination_test.py:431 still uncovered. `git diff --check` passed.
+
 Added `TERMS_OF_SERVICE.md` and `PRIVACY_POLICY.md` for Discord verification, with README links and publishing guidance. Checked current handlers, intents, API requests, in-memory menu ownership, and startup/error logging. Policies use the existing README support server; operator should confirm that contact route and hosting log practices before publication. Files are local only; no push, deployment, or portal changes. Documentation link checks and `git diff --check` passed; no behavioral tests needed for documentation changes.
 
 Expanded `/market-menu` with top gainers and top losers. Arbitrage is out of scope for now. Real snapshot findings remain in `SNAPSHOT_INSPECTION.md`.
