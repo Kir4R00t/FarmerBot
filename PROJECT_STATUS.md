@@ -1,8 +1,10 @@
 # Project status
 
-Updated: 2026-10-16
+Updated: 2026-10-18
 
 ## Current focus
+Added `.github/workflows/ci.yml`: every push, pull request, and manual dispatch runs the offline suite on Python 3.12 with read-only repository permissions, pip caching, a 10-minute timeout, and coverage artifacts retained for 14 days (also uploaded after test failures when available). README/TESTING document CI. The user reports importing the `main` protection ruleset into GitHub and deleting its local JSON; removed the stale import link. Deployment remains independent. All 76 tests passed locally using `/tmp/farmerbot-ci-verification/bin/python -B tools/run_tests.py` on Python 3.14.8 with 99.85% coverage; `git diff --check` passed. Python 3.12 and GitHub-hosted execution await the first CI run. Prepared these changes on `ci/offline-tests` for push and pull request review; no deployment or remote ruleset changes made by the agent.
+
 Added `TERMS_OF_SERVICE.md` and `PRIVACY_POLICY.md` for Discord verification, with README links and publishing guidance. Checked current handlers, intents, API requests, in-memory menu ownership, and startup/error logging. Policies use the existing README support server; operator should confirm that contact route and hosting log practices before publication. Files are local only; no push, deployment, or portal changes. Documentation link checks and `git diff --check` passed; no behavioral tests needed for documentation changes.
 
 Expanded `/market-menu` with top gainers and top losers. Arbitrage is out of scope for now. Real snapshot findings remain in `SNAPSHOT_INSPECTION.md`.
