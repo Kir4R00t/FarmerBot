@@ -149,7 +149,7 @@ class MarketDataTests(unittest.TestCase):
     def test_missing_core_icons_reserve_an_emoji_before_the_table(self):
         group = market.CategoryGroup('currency', 'ultimatum', 'Soul Cores')
         data = snapshot(
-            record(category='ultimatum', api_id='soul-core-of-zantipi', name='Soul Core of Zantipi'),
+            record(category='ultimatum', api_id='unknown-soul-core', name='Unknown Soul Core'),
             record(category='ultimatum', api_id='uromotis-soul-core-of-attenuation', name="Uromoti's Soul Core of Attenuation"),
         )
         embed, _, _ = market.create_category_embed([data], group, 'exalted', 0)
