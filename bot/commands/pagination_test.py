@@ -17,7 +17,7 @@ from bot.services.r2_snapshot_reader import (
     SnapshotConfigurationError,
     SnapshotReaderError,
 )
-from bot.util.emoji_loader import load_item_emojis
+from bot.util.emoji_loader import CURRENCY_EMOJI_CATEGORIES, load_item_emojis, resolve_item_emoji
 from bot.services.market_movers import Direction, ItemKind, rank_market_movers
 
 
@@ -187,16 +187,18 @@ def _format_price(value: float) -> str:
     return f"{value:.6f}".rstrip("0").rstrip(".") or "0"
 
 
-def _slug(value: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "-", value.casefold()).strip("-")
-
-
 def _item_emoji(record: dict[str, Any]) -> str:
-    candidates = (
+    if (
+        _text(record.get("item_kind")) != "currency"
+        or _text(record.get("category")) not in CURRENCY_EMOJI_CATEGORIES
+        or _text(record.get("api_id")) == "sep"
+    ):
+        return ""
+    return resolve_item_emoji(
+        EMOJIS,
         _text(record.get("api_id")),
-        _slug(_text(record.get("name"))),
+        _text(record.get("name")),
     )
-    return next((EMOJIS[key] for key in candidates if key in EMOJIS), "•")
 
 
 def _table_item_name(record: dict[str, Any], max_length: int = 40) -> str:
@@ -483,8 +485,10 @@ def create_category_embed(
         else:
             change_display = "= `0.00%`"
 
+        item_emoji = _item_emoji(record)
+        prefix = f"{item_emoji} " if item_emoji else ""
         lines.append(
-            f"{_item_emoji(record)} `{item_name:<{name_width}}  {price_text:>{price_width}}` "
+            f"{prefix}`{item_name:<{name_width}}  {price_text:>{price_width}}` "
             f"{_currency_marker(display_currency)} {change_display}"
         )
 
@@ -657,14 +661,17 @@ def create_movers_embed(
     price_width = max([len("Price"), *(len(row[2]) for row in rows)])
     change_width = max([len("Change"), *(len(row[3]) for row in rows)])
     quantity_width = max([len("Qty"), *(len(row[4]) for row in rows)])
+    header_prefix = "▫️ " if any(_item_emoji(row[0].record) for row in rows) else ""
     lines = [
-        f"▫️ `{'Item':<{name_width}}  {'Price':>{price_width}}  "
+        f"{header_prefix}`{'Item':<{name_width}}  {'Price':>{price_width}}  "
         f"{'Change':>{change_width}}  {'Qty':>{quantity_width}}`"
     ]
     arrow = EMOJIS.get("green-up", "▲") if direction == "gainers" else EMOJIS.get("red-down", "▼")
     for mover, name, price, change, quantity in rows[start:start + ITEM_PAGE_SIZE]:
+        item_emoji = _item_emoji(mover.record)
+        prefix = f"{item_emoji} " if item_emoji else ""
         lines.append(
-            f"{_item_emoji(mover.record)} `{name:<{name_width}}  {price:>{price_width}}  "
+            f"{prefix}`{name:<{name_width}}  {price:>{price_width}}  "
             f"{change:>{change_width}}  {quantity:>{quantity_width}}` {arrow}"
         )
     if not movers:

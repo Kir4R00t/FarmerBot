@@ -61,9 +61,25 @@ class MarketDataTests(unittest.TestCase):
 
     def test_emoji_and_currency_fallbacks(self):
         self.assertEqual(market._item_emoji(record(api_id="unknown", name="Chaos")), market.EMOJIS["chaos"])
-        self.assertEqual(market._item_emoji(record(api_id="unknown", name="Unknown")), "•")
+        self.assertEqual(market._item_emoji(record(api_id="unknown", name="Unknown")), "📦")
         self.assertEqual(market._currency_marker("unknown"), "Unknown")
         self.assertEqual(market._humanise_identifier(""), "Unknown")
+
+    def test_unique_and_non_exchange_rows_have_no_item_emoji_or_placeholder(self):
+        for kind, category, api_id, name in (
+            ('unique', 'jewel', 'against-the-darkness', 'Against the Darkness'),
+            ('unique', 'accessory', 'headhunter', 'Headhunter'),
+            ('currency', 'waystones', 'waystone-1', 'Waystone'),
+            ('currency', 'currency', 'sep', 'Currency'),
+        ):
+            with self.subTest(category=category):
+                item = record(item_kind=kind, category=category, api_id=api_id, name=name)
+                self.assertEqual(market._item_emoji(item), '')
+                embed, _, _ = market.create_category_embed(
+                    [snapshot(item)], market.CategoryGroup(kind, category, category.title()), 'exalted', 0,
+                )
+                self.assertTrue(embed.description.startswith('`' + name))
+                self.assertNotIn('📦', embed.description)
 
     def test_category_embeds_compare_in_the_displayed_currency(self):
         group = market.CategoryGroup("unique", "weapons", "Weapons")
@@ -129,6 +145,18 @@ class MarketDataTests(unittest.TestCase):
         cells = [line.split("`")[1] for line in (first.description + "\n" + last.description).splitlines()]
         self.assertEqual(len({len(cell) for cell in cells}), 1)
         self.assertIn("The longest name is on the last page", cells[-1])
+
+    def test_missing_core_icons_reserve_an_emoji_before_the_table(self):
+        group = market.CategoryGroup('currency', 'ultimatum', 'Soul Cores')
+        data = snapshot(
+            record(category='ultimatum', api_id='soul-core-of-zantipi', name='Soul Core of Zantipi'),
+            record(category='ultimatum', api_id='uromotis-soul-core-of-attenuation', name="Uromoti's Soul Core of Attenuation"),
+        )
+        embed, _, _ = market.create_category_embed([data], group, 'exalted', 0)
+        lines = embed.description.splitlines()
+        self.assertTrue(lines[0].startswith('📦 `'))
+        self.assertTrue(lines[1].startswith(market.EMOJIS['uromotis-soul-core-of-attenuation'] + ' `'))
+        self.assertEqual(len(lines[0].split('`')[1]), len(lines[1].split('`')[1]))
 
     def test_table_names_cannot_break_rows_or_inline_code(self):
         group = market.CategoryGroup("unique", "weapons", "Weapons")

@@ -6,7 +6,7 @@ import logging
 import asyncio
 import math
 
-from bot.util.emoji_loader import load_item_emojis
+from bot.util.emoji_loader import load_item_emojis, resolve_item_emoji
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -97,11 +97,6 @@ class CurrencyExchange():
                 if 'lesser' in item_name or 'greater' in item_name:
                     continue
             
-            # If there are any missing emojis just log them and skip to the next iteration
-            if item_name not in self.emojis:
-                logger.warning(f'Emote missing for {item_name}')
-                continue
-            
             # If the price is over 1.3 the given multiplier. Price it in div. Else price it to ref_choice
             if price > (current_div_multiplier * 1.3):
                 div_price = price / current_div_multiplier
@@ -111,7 +106,7 @@ class CurrencyExchange():
                 price_str = f"{round(price, 2)}"
                 price_emoji = self.emojis[ref_choice.value]
             
-            item_emoji = self.emojis.get(item_name, '')
+            item_emoji = resolve_item_emoji(self.emojis, item_name)
             name_display = item_name.replace('-', ' ')
             max_name_length = max(max_name_length, len(name_display))
             
@@ -135,6 +130,20 @@ class CurrencyExchange():
             all_items.append(line)
         
         description_text = "\n".join(all_items) or "No prices available for this category."
+        if len(description_text) > 4096:
+            # Keeping unmapped items can make large categories exceed Discord's
+            # description limit. Preserve whole rows and point to the paged menu.
+            visible = []
+            for line in all_items:
+                note = f"\n\nShowing {len(visible) + 1} of {len(all_items)} items. Use /market-menu to browse all items."
+                candidate = "\n".join(visible + [line])
+                if len(candidate) + len(note) > 4096:
+                    break
+                visible.append(line)
+            description_text = "\n".join(visible) + (
+                f"\n\nShowing {len(visible)} of {len(all_items)} items. "
+                "Use /market-menu to browse all items."
+            )
         
         embed = discord.Embed(
             title=f"{self.emojis['divine']} {category.name} Pricing {self.emojis['divine']}",
