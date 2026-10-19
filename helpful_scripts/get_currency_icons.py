@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import re
 import sys
+import unicodedata
 from urllib.parse import urlparse
 
 import requests
@@ -14,6 +15,19 @@ sys.path.insert(0, str(ROOT))
 
 from tools.audit_item_emojis import audit_items
 from bot.util.emoji_loader import CURRENCY_EMOJI_CATEGORIES
+
+
+def icon_filename(key):
+    """Use lowercase underscore-separated upload names, preserving mapping keys."""
+    if not isinstance(key, str) or not re.fullmatch(r'[\w-]+', key):
+        raise ValueError('Icon keys must be safe, nonempty filename identifiers')
+    ascii_key = unicodedata.normalize('NFKD', key).encode('ascii', 'ignore').decode()
+    name = re.sub(r'[^a-z0-9]+', '_', ascii_key.lower()).strip('_')
+    if not name:
+        raise ValueError(f'Icon key has no usable upload name: {key}')
+    if len(name) < 2:
+        name = 'item_' + name
+    return name + '.png'
 
 
 def icon_entries(payload):
@@ -38,8 +52,16 @@ def icon_entries(payload):
         key = entry.get('key')
         if not isinstance(key, str) or not re.fullmatch(r'[\w-]+', key):
             raise ValueError('Icon keys must be safe, nonempty filename identifiers')
-    return [entry for entry in entries
-            if entry.get('category') in CURRENCY_EMOJI_CATEGORIES and entry['key'] != 'sep']
+    entries = [entry for entry in entries
+               if entry.get('category') in CURRENCY_EMOJI_CATEGORIES and entry.get('key') != 'sep']
+    filenames = {}
+    for entry in entries:
+        key = entry.get('key')
+        filename = icon_filename(key)
+        if filename in filenames and filenames[filename] != key:
+            raise ValueError(f'Icon keys {filenames[filename]!r} and {key!r} share upload filename {filename!r}')
+        filenames[filename] = key
+    return entries
 
 
 def download_icons(entries, folder):
@@ -48,7 +70,15 @@ def download_icons(entries, folder):
     saved = skipped = failed = 0
     for entry in entries:
         key = entry['key']
-        destination = folder / (key + '.png')
+        destination = folder / icon_filename(key)
+        legacy = folder / (key + '.png')
+        try:
+            if not destination.exists() and legacy.is_file():
+                legacy.rename(destination)
+        except OSError as exc:
+            print(f'Could not rename existing icon {key}: {exc}', file=sys.stderr)
+            failed += 1
+            continue
         if destination.exists():
             skipped += 1
             continue

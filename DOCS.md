@@ -47,10 +47,19 @@ does not check server capacity or upload emojis.
 
 The downloader also accepts a catalogue/category URL instead of `--report`.
 It accepts PascalCase/camelCase fields, filters non-exchange entries even from
-older reports, and uses full API IDs as filenames. Repeat `--category` to select
-several categories or omit it for all eligible entries. Existing files are
-preserved. Missing URLs, HTTP failures, and non-PNG responses produce a nonzero
-exit status while other downloads continue. Requests use timeouts. Category
+older reports, and saves lowercase filenames with underscores between words:
+`soul-core-of-cholotl` becomes `soul_core_of_cholotl.png`. Accents are normalized
+to ASCII (for example, `mórrigans-insight` becomes `morrigans_insight.png`).
+These filenames follow the project's emoji naming convention and
+[Discord's permitted emoji-name characters](https://support.discord.com/hc/en-us/articles/360036479811-How-to-Add-Custom-Emojis-on-Discord); the JSON mapping
+keys retain their exact full API IDs, including hyphens and accents. Emoji names
+inside `<:name:id>` use the actual name assigned in Discord.
+
+Repeat `--category` to select several categories or omit it for all eligible
+entries. Existing hyphenated downloads are renamed locally when the new filename
+does not exist; existing destination files are preserved. Keys that normalize to
+the same upload filename are rejected before any downloads. Missing URLs, HTTP
+failures, and non-PNG responses produce a nonzero exit status while other downloads continue. Requests use timeouts. Category
 URLs process only the supplied page; use a complete `/Items` catalogue or its
 audit for full coverage.
 
