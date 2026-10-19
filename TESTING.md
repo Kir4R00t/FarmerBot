@@ -64,3 +64,11 @@ catalogues and mocked downloads to check category exclusions, missing mappings,
 capacity boundaries, report output, safe filenames, existing-file preservation,
 and partial failures. No saved audit results or downloaded icons are needed;
 the ignored `emoji_audit/` folder may be absent in a fresh clone.
+
+The browser-console exporter has separate JavaScript fixtures:
+`node tests/test_emoji_exporter.cjs` (Node.js, no npm packages). They check both
+fetch and XHR capture, exact ID preservation, static/animated references,
+duplicate names, invalid data, unrelated/paginated/failed requests, cleanup,
+timeout, and JSON download contents. These tests simulate the browser and
+Portal responses; they do not verify the live Developer Portal UI. They are
+separate from the Python offline suite and bot coverage report.
