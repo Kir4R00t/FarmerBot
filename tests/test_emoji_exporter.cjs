@@ -55,6 +55,10 @@ async function testEmojiExporter(source) {
 
   {
     const env = environment(); install(env);
+    assert(env.window.farmerEmojiExport.status === "waiting", "Report waiting before any response");
+    let rejected = false;
+    try { env.window.farmerEmojiExport.download(); } catch { rejected = true; }
+    assert(rejected && env.downloads.length === 0, "Explain retry before capture without downloading");
     const result = env.window.farmerEmojiExport.fromResponse(payload);
     assert(result.emoji_count === 2, "Export both emojis");
     assert(result.emojis.some(e => e.id === "9007199254740993123"), "Preserve exact snowflake strings");
@@ -64,6 +68,25 @@ async function testEmojiExporter(source) {
     assert(env.downloads.length === 1 && JSON.parse(env.downloads[0].text).application_id === "123", "Download parsed JSON");
     assert(!("soul-core" in result.references_by_name), "Do not invent API keys");
     assert(env.window.fetch === env.originalFetch && env.window.XMLHttpRequest.prototype.open === env.originalOpen, "Restore original browser functions");
+    assert(env.window.farmerEmojiExport.status === "captured", "Report captured after cleanup");
+    env.window.farmerEmojiExport.download();
+    assert(env.downloads.length === 2 && env.downloads[0].text === env.downloads[1].text, "Retry the same JSON download after cleanup");
+  }
+  {
+    const env = environment(); install(env);
+    const createElement = env.window.document.createElement;
+    let removed = false;
+    env.window.document.createElement = () => ({
+      click() { throw new Error("Download unavailable"); }, remove() { removed = true; },
+    });
+    const result = env.window.farmerEmojiExport.fromResponse(payload);
+    assert(result.emoji_count === 2 && env.window.farmerEmojiExport.result === result,
+      "Keep captured JSON available when download throws");
+    assert(removed && env.errors.length === 1 && env.window.fetch === env.originalFetch &&
+      env.window.XMLHttpRequest.prototype.open === env.originalOpen, "Clean up and report failed download");
+    env.window.document.createElement = createElement;
+    env.window.farmerEmojiExport.download();
+    assert(JSON.parse(env.downloads[1].text).emoji_count === 2, "Retry after a failed automatic download");
   }
   {
     const env = environment(); install(env);
@@ -114,6 +137,7 @@ async function testEmojiExporter(source) {
     assert(oldController !== env.window.farmerEmojiExport && pending.events.size === 0, "Reinstallation cleans up pending listeners");
     [...env.timers.values()].find(timer => timer.delay === 180000).callback();
     assert(env.window.fetch === env.originalFetch && env.window.XMLHttpRequest.prototype.open === env.originalOpen, "Timeout restores hooks");
+    assert(env.window.farmerEmojiExport.status === "stopped", "Distinguish timeout from waiting and capture");
   }
   {
     const env = environment(); env.window.location.hostname = "example.com";
