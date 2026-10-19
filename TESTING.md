@@ -38,8 +38,8 @@ by function. Coverage includes every Python module under `bot`, including the
 namespace directory `bot/services`. No executable bot functions are omitted and
 there are no custom coverage exclusions. Coverage.py's defaults exclude the
 type-only `S3Client` Protocol declaration; the real reader implementation is
-fully measured. The local maintenance scripts and test tooling itself are outside the bot
-coverage scope.
+fully measured. The maintenance scripts and test tooling itself are outside the bot coverage
+scope.
 
 Line coverage asks whether a statement ran. Branch coverage asks whether each
 control-flow outcome ran. The terminal's `Cover` column combines both; the XML
@@ -56,11 +56,11 @@ Live Discord permissions, network behavior, command synchronization against
 Discord, and actual cloud credentials are not verified by these offline tests.
 Those need a separate integration run with a dedicated test bot/server.
 
-## Local emoji maintenance tests
+## Emoji maintenance tests
 
-The Git-ignored `emoji_audit/` folder holds the missing-emoji audit, downloader,
-and their dedicated tests. When present, run `python emoji_audit/run_tests.py`
-from the repository root to run both the versioned suite and local maintenance
-tests with network access blocked and the same bot coverage reports. The normal
-`python tools/run_tests.py` command does not depend on those local files, which
-are absent from fresh clones.
+The versioned `tests/test_emoji_audit.py` and `tests/test_icon_downloader.py`
+run with the normal `python tools/run_tests.py` suite. They use synthetic
+catalogues and mocked downloads to check category exclusions, missing mappings,
+capacity boundaries, report output, safe filenames, existing-file preservation,
+and partial failures. No saved audit results or downloaded icons are needed;
+the ignored `emoji_audit/` folder may be absent in a fresh clone.

@@ -69,13 +69,23 @@ or placeholder; price-reference markers and change indicators remain. Large
 legacy `/poe2scout` results stop at whole rows within Discord's description limit
 and point to `/market-menu` for full pagination.
 
-Missing-emoji maintenance lives in the Git-ignored `emoji_audit/` folder:
-audit and download scripts, dedicated tests, findings, reports, and icons.
-It is local-only and is not included in commits, fresh clones, or deployments.
-When that folder is present, see [its audit guide](emoji_audit/EMOJI_AUDIT.md)
-and run `python emoji_audit/run_tests.py` for the bot and maintenance tests.
-The normal `python tools/run_tests.py` suite works without the folder.
-Runtime mappings and bot tests remain versioned and independent of these tools.
+## Checking emoji coverage
+
+Contributors can check NPC currency-exchange items against the runtime mapping:
+
+```bash
+python tools/audit_item_emojis.py --league "Runes of Aldur"
+```
+
+This fetches the public catalogue, prints a local summary, and writes the list
+to `emoji_audit/reports/missing-item-emojis.json`. The folder is created as
+needed and ignored by Git. No bot token is needed and no Discord changes are
+made. Use `--input path/to/items.json` to check a saved catalogue offline.
+
+Audit/download scripts, tests, and usage instructions are versioned. Generated
+reports, counts, downloaded icons, and session findings stay local in
+`emoji_audit/`; do not commit them. See [DOCS.md](DOCS.md#emoji-maintenance)
+for download and capacity options. The bot never reads the audit reports.
 
 ## Docker
 

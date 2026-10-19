@@ -15,15 +15,47 @@ These are separate quotas; do not apply the server limit to the application.
 ### # gibcat
 It's just a simple call to a [free cat pic API](https://thecatapi.com)
 
-## Local emoji maintenance
+## Emoji maintenance
 
-The missing-emoji audit, icon downloader, dedicated tests, findings, reports,
-and downloaded icons live under Git-ignored `emoji_audit/`. These local files
-are not distributed with the repository or required by the bot. When present,
-[the local audit guide](emoji_audit/EMOJI_AUDIT.md) contains the current commands
-and findings. Run `python emoji_audit/run_tests.py` to verify both runtime and
-maintenance behavior; `python tools/run_tests.py` verifies the versioned suite
-independently.
+The versioned audit and downloader let each contributor check emoji coverage.
+Run these commands from the repository root after installing the project
+requirements:
+
+```bash
+python tools/audit_item_emojis.py --league 'Runes of Aldur'
+python helpful_scripts/get_currency_icons.py emoji_audit/icons/missing-soul-cores --report emoji_audit/reports/missing-item-emojis.json --category ultimatum
+```
+
+The audit creates `emoji_audit/reports/missing-item-emojis.json`. This report,
+local findings, saved catalogues, and downloaded icons stay in Git-ignored
+`emoji_audit/`. Documentation contains instructions rather than a published
+missing-item count or list. Contributors regenerate their own results locally.
+The bot depends only on its runtime mapping and shared lookup code.
+
+Only NPC currency-exchange categories in `bot/util/emoji_loader.py` are checked;
+uniques, non-exchange categories, and separators are excluded. Review that
+allowlist when upstream categories change. Use `--input path/to/items.json`
+to audit a saved `/Items` response, or `--output path/to/report.json` to choose
+a different destination; keep custom outputs in an ignored folder.
+
+For an application upload plan, optionally supply `--application-emoji-count N`
+with the current full Developer Portal inventory, including unused uploads.
+The report deduplicates mapped IDs and estimates one new upload per missing key.
+Without that inventory, capacity remains explicitly unverified. An over-limit
+plan exits with code 2. Application and server quotas are separate; this tool
+does not check server capacity or upload emojis.
+
+The downloader also accepts a catalogue/category URL instead of `--report`.
+It accepts PascalCase/camelCase fields, filters non-exchange entries even from
+older reports, and uses full API IDs as filenames. Repeat `--category` to select
+several categories or omit it for all eligible entries. Existing files are
+preserved. Missing URLs, HTTP failures, and non-PNG responses produce a nonzero
+exit status while other downloads continue. Requests use timeouts. Category
+URLs process only the supplied page; use a complete `/Items` catalogue or its
+audit for full coverage.
+
+Run `python tools/run_tests.py` to check runtime and maintenance behavior with
+external services faked and network connections blocked.
 
 ## Item emojis
 `bot/util/item_emojis.json` maps item API IDs (and indicators such as `green-up`)
