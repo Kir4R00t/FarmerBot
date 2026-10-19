@@ -45,6 +45,29 @@ class EmojiLoaderTests(unittest.TestCase):
             self.assertIsInstance(emojis[name], str)
         self.assertEqual(pagination_test.EMOJIS, emojis)
 
+    def test_full_api_keys_resolve_uploaded_names_with_accents_and_truncation(self):
+        emojis = emoji_loader.load_item_emojis()
+        cases = {
+            'soul-core-of-zantipi': '<:soul_core_of_zantipi:1561860500659118242>',
+            'ancient-concentrated-liquid-isolation': '<:ancient_concentrated_liquid_isol:1561862381145948201>',
+            'ancient-concentrated-liquid-suffering': '<:ancient_concentrated_liquid_suff:1561862382966280202>',
+            'jiquanis-soul-core-of-malediction': '<:jiquanis_soul_core_of_maledictio:1561862666618806292>',
+            'mórrigans-insight': '<:morrigans_insight:1561862880503009280>',
+            'legacy-of-mjölner': '<:legacy_of_mjolner:1561862776169693225>',
+            # Vault-key API IDs can share the name of unique equipment.
+            'temporalis': '<:temporalis:1561863131033247814>',
+        }
+        for api_id, expected in cases.items():
+            with self.subTest(api_id=api_id):
+                self.assertEqual(emoji_loader.resolve_item_emoji(emojis, api_id), expected)
+
+    def test_mapping_keeps_non_exchange_uploads_out_and_missing_item_visible(self):
+        emojis = emoji_loader.load_item_emojis()
+        for key in ('bear-talisman', 'rite-of-passage', 'wolf-talisman'):
+            with self.subTest(key=key):
+                self.assertNotIn(key, emojis)
+        self.assertEqual(emoji_loader.resolve_item_emoji(emojis, 'unknown-item-without-emoji'), '📦')
+
     def test_rejects_invalid_mapping_shapes(self):
         with tempfile.TemporaryDirectory() as directory:
             loader_path = Path(directory) / "emoji_loader.py"
