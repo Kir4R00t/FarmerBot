@@ -66,6 +66,37 @@ audit for full coverage.
 Run `python tools/run_tests.py` to check runtime and maintenance behavior with
 external services faked and network connections blocked.
 
+### Exporting application emoji IDs from the browser
+
+Open your application's **Emojis** page in the Discord Developer Portal, open
+the browser developer tools **Console**, and paste the entire contents of
+[`helpful_scripts/export_application_emojis.js`](helpful_scripts/export_application_emojis.js).
+Switch to **General Information**, then back to **Emojis** without reloading the
+page. The script watches the next successful full emoji-list response and
+downloads `application-emojis-APPLICATION_ID.json`. This reads the Portal's
+normal response; the script itself makes no requests, reads no credentials, and
+does not upload, rename, or delete emojis. It restores its hooks after exporting
+or after three minutes. To stop earlier, run `farmerEmojiExport.stop()`.
+
+The JSON contains the application ID, export timestamp, distinct emoji count,
+and all emoji names, exact string IDs, animation flags, and Discord references.
+`references_by_name` contains references for unique Discord names; duplicate
+names remain in the full `emojis` array and are flagged in `duplicate_names`.
+No uploader/account data is included. Keep this generated file inside ignored
+`emoji_audit/`.
+
+Discord names are not automatically changed into API mapping keys: shortened
+names and normalized accents cannot be reversed reliably. Use the export with
+the local download manifest and existing mapping to match full API keys before
+updating `bot/util/item_emojis.json`.
+
+If tab switching does not issue a fresh request (for example, the Portal caches
+the list), use the browser **Network** panel to copy the JSON response from the
+application's full emoji-list GET request, then pass that object to
+`farmerEmojiExport.fromResponse(PASTE_JSON_OBJECT_HERE)`. Do this while the
+exporter is still active. The helper supports fetch and XHR responses; its live
+behavior depends on the Portal's current request implementation.
+
 ## Item emojis
 `bot/util/item_emojis.json` maps item API IDs (and indicators such as `green-up`)
 to Discord emoji strings. Edit this JSON object to add or replace an emoji:
