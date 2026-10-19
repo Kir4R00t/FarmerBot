@@ -97,6 +97,17 @@ application's full emoji-list GET request, then pass that object to
 exporter is still active. The helper supports fetch and XHR responses; its live
 behavior depends on the Portal's current request implementation.
 
+If no file appears, check the browser's download history and run
+`window.farmerEmojiExport?.status` in the same Console. `undefined` means the
+helper is not installed in this page context; `waiting` means no valid list has
+been captured; `stopped` means it timed out or was stopped without capturing a
+list. Paste the script again if needed, then switch tabs without reloading.
+`captured` means the JSON is available, even if the browser did not save a file.
+Run `farmerEmojiExport.download()` to retry saving it. Alternatively, run
+`copy(JSON.stringify(farmerEmojiExport.result, null, 2))` in the Developer Console
+and paste the clipboard into a local JSON file under `emoji_audit/`.
+The helper can request a download but cannot confirm that the browser saved it.
+
 ## Item emojis
 `bot/util/item_emojis.json` maps item API IDs (and indicators such as `green-up`)
 to Discord emoji strings. Edit this JSON object to add or replace an emoji:
