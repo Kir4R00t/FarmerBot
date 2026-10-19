@@ -61,27 +61,21 @@ Startup connects to Discord, registers event handlers, and syncs slash commands 
 
 Emoji mappings are versioned in `bot/util/item_emojis.json`; restart the bot after editing them.
 
-## Checking missing item emojis
+## Item emoji behavior
 
-Compare a league's complete PoE2Scout item catalogue with the shared emoji mapping:
+Both market commands keep unmapped exchange items visible using the configurable
+`default-item` emoji (📦). Unique and non-exchange item rows have no item emoji
+or placeholder; price-reference markers and change indicators remain. Large
+legacy `/poe2scout` results stop at whole rows within Discord's description limit
+and point to `/market-menu` for full pagination.
 
-```bash
-python3 tools/audit_item_emojis.py --league "Runes of Aldur"
-```
-
-The script uses the current documented API host and saves missing keys, names,
-categories, and icon URLs to `reports/missing-item-emojis.json` (ignored by Git).
-It makes no Discord changes and requires no bot token or additional dependencies.
-Use `--input path/to/items.json` to compare a saved `/Items` response offline,
-or `--output path/to/report.json` to choose another report destination.
-
-The comparison follows `/market-menu` lookup: API ID, then slugged item name.
-Missing mappings can include old items, renamed identifiers, and uniques; they
-are not necessarily new league additions. The audit does not verify that mapped
-Discord emojis still exist. Upload any needed icons to Discord, add their actual
-emoji references under the reported keys in `bot/util/item_emojis.json`, then
-restart/redeploy the bot. The legacy `/poe2scout` command skips unmapped items and
-logs `Emote missing for ...`; the market menu shows a bullet instead.
+Missing-emoji maintenance lives in the Git-ignored `emoji_audit/` folder:
+audit and download scripts, dedicated tests, findings, reports, and icons.
+It is local-only and is not included in commits, fresh clones, or deployments.
+When that folder is present, see [its audit guide](emoji_audit/EMOJI_AUDIT.md)
+and run `python emoji_audit/run_tests.py` for the bot and maintenance tests.
+The normal `python tools/run_tests.py` suite works without the folder.
+Runtime mappings and bot tests remain versioned and independent of these tools.
 
 ## Docker
 
@@ -114,7 +108,7 @@ See [TESTING.md](TESTING.md) for test scope and coverage limitations, [DOCS.md](
 
 ## Repository hygiene and contributing
 
-Git ignores local environment files, credentials under `.aws/`, virtual environments, Python caches, coverage reports, downloaded `icons/`, root `output.json`, logs, editor settings, and local agent state. Shared instructions (`AGENTS.md`), tests, documentation, and emoji mappings remain versionable. Placeholder-only `.env.example` files are allowed.
+Git ignores local environment files, credentials under `.aws/`, virtual environments, Python caches, coverage reports, the local `emoji_audit/` workspace, downloaded `icons/`, root `output.json`, logs, editor settings, and local agent state. Shared instructions (`AGENTS.md`), runtime tests, shared documentation, and emoji mappings remain versionable. Placeholder-only `.env.example` files are allowed.
 
 Before committing, review `git status --short`, `git diff`, and `git diff --cached`. Ignore rules do not remove files already tracked by Git or erase earlier commits; keep credentials out of source and documentation.
 

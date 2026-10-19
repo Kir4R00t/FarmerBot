@@ -4,17 +4,26 @@
 To retrieve data about current currency market prices I use 
 [poe2scout.com's website free API](https://api.poe2scout.com/swagger/index.html) <br>
 
-When it comes to making good looking embeds to nicely display all desired currency prices all I had to do was create empty discord servers just to add emojis (it's a workaround for emoji limit of 50 for free servers) because the bot can use all emojis that it has access to on any server it's on.
+Custom emoji references can point to application-owned or server-owned emojis.
+The older setup used extra servers for emoji storage; the mapping strings alone
+do not identify where an emoji is hosted. Discord documents a limit of
+[2,000 application-owned emojis](https://docs.discord.com/developers/resources/emoji#application-owned-emoji),
+managed through the Developer Portal or API. A regular unboosted server has
+[50 static and 50 animated slots](https://discord.com/blog/beginners-guide-to-custom-emojis).
+These are separate quotas; do not apply the server limit to the application.
 
 ### # gibcat
 It's just a simple call to a [free cat pic API](https://thecatapi.com)
 
-## Util scripts
-### # get_currency_icons.py
-Script that automatically downloads icons of all currencies from a given category (provided by a valid url to poe2scout.com API). <br>
-File names of icons are set as 'apiId' of each currency so that it's then easier to match them later in `bot/util/item_emojis.json`. <br>
-To run the script you have to: <br> 
-```python get_currency_icons.py <path_to_folder> <poe2scout_api_url>```
+## Local emoji maintenance
+
+The missing-emoji audit, icon downloader, dedicated tests, findings, reports,
+and downloaded icons live under Git-ignored `emoji_audit/`. These local files
+are not distributed with the repository or required by the bot. When present,
+[the local audit guide](emoji_audit/EMOJI_AUDIT.md) contains the current commands
+and findings. Run `python emoji_audit/run_tests.py` to verify both runtime and
+maintenance behavior; `python tools/run_tests.py` verifies the versioned suite
+independently.
 
 ## Item emojis
 `bot/util/item_emojis.json` maps item API IDs (and indicators such as `green-up`)
@@ -22,13 +31,29 @@ to Discord emoji strings. Edit this JSON object to add or replace an emoji:
 
 ```json
 {
-  "exalted": "<:exalt:1355493424207237210>"
+  "exalted": "<:exalt:1355493424207237210>",
+  "default-item": "📦"
 }
 ```
 
 Both market commands load this file through `bot/util/emoji_loader.py`.
 Restart the bot after editing it. The JSON file is versioned and included in
 the Docker image by the existing `COPY bot ./bot` instruction.
+
+An unmapped exchange item uses `default-item`, with 📦 as the built-in fallback. It reserves
+an emoji position before the monospace cells instead of a narrow text bullet.
+You can replace `default-item` with a custom Discord emoji reference. Actual
+spacing still depends on the Discord client, and long rows may wrap on small
+screens. The legacy command also keeps missing items, cutting large results at
+whole rows with a note directing users to `/market-menu`.
+
+Unique and non-exchange item rows show their names/prices without an item emoji
+or placeholder. Their price-reference currency markers and change indicators
+remain available; the item rows and ranking headers start at the text column.
+
+Mapping keys must retain the full currency API ID. The emoji name
+inside `<:name:id>` can be shorter; copying that short name into the JSON key
+can prevent lookup even when the emoji is already uploaded.
 
 ## Market menu price layout
 `/market-menu` category pages use the original `/poe2scout` table style:
@@ -44,7 +69,7 @@ pagination remain available.
 Open `/market-menu`, then choose **Top Gainers** or **Top Losers**. Category
 pages now show 15 category buttons to leave space for these two entry points.
 Ranking pages show aligned **Item**, **Price**, **Change**, and **Qty** columns,
-with item emojis and green/red change indicators. Names are shortened to 28
+with item emojis for exchange currencies and green/red change indicators. Names are shortened to 28
 characters in rankings, and column widths stay consistent between pages.
 
 - Gainers rank the largest positive percentage first; losers rank the largest
