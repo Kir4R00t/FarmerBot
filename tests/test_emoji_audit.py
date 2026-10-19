@@ -1,4 +1,5 @@
 import json
+import io
 from pathlib import Path
 import tempfile
 import unittest
@@ -8,6 +9,24 @@ from tools.audit_item_emojis import audit_items, emoji_capacity, main
 
 
 class EmojiAuditTests(unittest.TestCase):
+    def test_live_catalogue_request_identifies_client_and_preserves_source(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            mapping, output = root / 'mapping.json', root / 'report.json'
+            mapping.write_text('{}')
+            response = io.BytesIO(b'[{"ApiId":"new","CategoryApiId":"currency"}]')
+            with patch('tools.audit_item_emojis.urlopen', return_value=response) as get:
+                self.assertEqual(main(['--league', 'Example League', '--mapping', str(mapping),
+                                       '--output', str(output)]), 0)
+            request = get.call_args.args[0]
+            self.assertEqual(request.full_url, 'https://api.poe2scout.com/poe2/Leagues/Example%20League/Items')
+            self.assertEqual(request.get_header('User-agent'), 'FarmerBot emoji coverage audit')
+            self.assertEqual(request.get_header('Accept'), 'application/json')
+            self.assertEqual(get.call_args.kwargs['timeout'], 30)
+            report = json.loads(output.read_text())
+            self.assertEqual(report['source'], request.full_url)
+            self.assertEqual(report['missing'][0]['key'], 'new')
+
     def test_default_report_is_created_inside_local_workspace(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

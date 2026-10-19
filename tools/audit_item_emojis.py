@@ -8,7 +8,7 @@ import re
 import sys
 from urllib.error import URLError
 from urllib.parse import quote
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -114,7 +114,11 @@ def main(argv=None):
         else:
             source_name = ('https://api.poe2scout.com/poe2/Leagues/'
                            + quote(args.league, safe='') + '/Items')
-            with urlopen(source_name, timeout=30) as response:
+            request = Request(source_name, headers={
+                'User-Agent': 'FarmerBot emoji coverage audit',
+                'Accept': 'application/json',
+            })
+            with urlopen(request, timeout=30) as response:
                 items = json.load(response)
         emojis = json.loads(args.mapping.read_text(encoding='utf-8'))
         if not isinstance(emojis, dict) or not all(

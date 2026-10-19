@@ -1,6 +1,6 @@
 # Project status
 
-Updated: 2026-10-19
+Updated: 2026-10-20
 
 ## Current decisions
 - Work on `dev`, tracking `origin/dev`; working directly on `main` requires an explicit instruction for the task.
@@ -13,8 +13,10 @@ Updated: 2026-10-19
 
 ## Verification
 - Reviewed every changed/new file from the previous session. Saved catalogue checks confirm the 17 exchange categories plus legacy alias, nine key repairs, all 24 exact-image aliases, and 19 out-of-scope removals.
-- Python 3.14.8 temporary environment, dependencies installed from `requirements-dev.txt`: all 100 versioned offline tests pass via `python -B tools/run_tests.py`, including audit/downloader tests for default report output, normalized upload filenames, preserved API keys, filename collisions, legacy-file migration, and existing-file preservation. The runner blocks network access and fakes external services; no local findings/assets are required.
+- Python 3.14.8 temporary environment, dependencies installed from `requirements-dev.txt`: all 101 versioned offline tests pass via `python -B tools/run_tests.py`, including audit/downloader tests for default report output, normalized upload filenames, preserved API keys, filename collisions, legacy-file migration, existing-file preservation, and identified live-catalogue HTTP requests. The runner blocks network access and fakes external services; no local findings/assets are required.
 - Bot coverage is 99.78%, with all bot modules included. Inspected gaps: defensive numeric skip after prior filtering (`pagination_test.py:433`) and oversized-description loop exhaustion (`poe2scout.py:137->143`). No exclusions added. Reports are under ignored `reports/`.
+- Refreshed the public catalogue and category boundary, downloaded missing exchange icons into ignored `emoji_audit/icons/missing-exchange/`, and generated a local ZIP and filename/API-ID manifest. Counts and full findings stay in the ignored reports. PNG chunk checksums, image streams, dimensions, filenames, and ZIP integrity were verified.
+- The API rejected the default urllib request with HTTP 403; the audit now sends an identifying User-Agent and JSON Accept header. Live requests succeeded, and a mocked regression checks headers, URL encoding, timeout, and report source.
 - Audit paths resolve from the repository root independently of the working directory. Generated reports default to the ignored workspace. Public documentation links target versioned instructions, with no current missing-item count/list. Ignore rules, syntax parsing, and `git diff --check` checked.
 - Python 3.12/Docker and live Discord rendering remain untested. No bot startup, live-resource changes, or deployment performed.
 
