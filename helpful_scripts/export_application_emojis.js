@@ -37,6 +37,23 @@
     listeners.clear();
   }
 
+  function download() {
+    const result = window.farmerEmojiExport.result;
+    if (!result) throw new Error("No emoji list captured yet. Reopen the Emojis tab without reloading.");
+    const blob = new window.Blob([JSON.stringify(result, null, 2) + "\n"], { type: "application/json" });
+    const href = window.URL.createObjectURL(blob);
+    const link = window.document.createElement("a");
+    link.href = href;
+    link.download = `application-emojis-${applicationId}.json`;
+    try {
+      window.document.body.appendChild(link);
+      link.click();
+    } finally {
+      link.remove();
+      window.setTimeout(() => window.URL.revokeObjectURL(href), 10000);
+    }
+  }
+
   function exportResponse(payload) {
     if (!active) return;
     const items = Array.isArray(payload) ? payload : payload?.items;
@@ -73,17 +90,11 @@
       duplicate_names: [...names].filter(([, count]) => count > 1).map(([name]) => name),
     };
     window.farmerEmojiExport.result = result;
-    const blob = new window.Blob([JSON.stringify(result, null, 2) + "\n"], { type: "application/json" });
-    const href = window.URL.createObjectURL(blob);
-    const link = window.document.createElement("a");
-    link.href = href;
-    link.download = `application-emojis-${applicationId}.json`;
-    window.document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.setTimeout(() => window.URL.revokeObjectURL(href), 10000);
     stop();
-    window.console.log(`Exported ${emojis.length} emojis. Download: ${link.download}`, result);
+    try { download(); }
+    catch (error) { window.console.error("Emoji download:", error.message); }
+    window.console.log(`Captured ${emojis.length} emojis; requested download of application-emojis-${applicationId}.json. ` +
+      "If no file appeared, run farmerEmojiExport.download() to retry, or copy(JSON.stringify(farmerEmojiExport.result, null, 2)) to copy the JSON.", result);
     return result;
   }
 
@@ -121,7 +132,10 @@
     return result;
   }
 
-  window.farmerEmojiExport = { stop, fromResponse: exportResponse, result: null };
+  window.farmerEmojiExport = {
+    stop, download, fromResponse: exportResponse, result: null,
+    get status() { return this.result ? "captured" : active ? "waiting" : "stopped"; },
+  };
   window.fetch = captureFetch;
   window.XMLHttpRequest.prototype.open = captureOpen;
   timer = window.setTimeout(() => {
