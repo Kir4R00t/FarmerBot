@@ -10,6 +10,7 @@ Updated: 2026-10-20
 - Emoji audit/download tools, dedicated tests, and neutral instructions are versioned for contributors. Generated missing-item reports/counts/lists, saved catalogues, icons, and session findings remain local-only under Git-ignored `emoji_audit/`. The audit creates that folder when needed; the bot never reads it. Do not publish dated audit findings in shared docs.
 - Downloader PNG filenames use lowercase words separated by underscores, with accents normalized to ASCII. Exact full API IDs remain mapping keys. Existing hyphenated downloads are renamed without redownloading; existing destination files are preserved, and normalized-name collisions are rejected. This convention is saved in `AGENTS.md` and `DOCS.md`.
 - The user clarified that reusable tools should be available in a future `main` release, while generated findings stay local. Changes remain on `dev`; `main` has not received the runtime emoji fixes or new audit workflow.
+- Added `helpful_scripts/export_application_emojis.js`: paste into the Developer Portal Console and reopen the Emojis tab to capture its full list response and download parsed JSON. The helper makes no requests, reads no credentials, preserves string IDs/static or animated references, flags duplicate names, and restores its hooks. Exported inventory stays in ignored `emoji_audit/`; API-key matching remains a separate step using the manifest/current mapping.
 
 ## Verification
 - Reviewed every changed/new file from the previous session. Saved catalogue checks confirm the 17 exchange categories plus legacy alias, nine key repairs, all 24 exact-image aliases, and 19 out-of-scope removals.
@@ -19,6 +20,7 @@ Updated: 2026-10-20
 - The API rejected the default urllib request with HTTP 403; the audit now sends an identifying User-Agent and JSON Accept header. Live requests succeeded, and a mocked regression checks headers, URL encoding, timeout, and report source.
 - Audit paths resolve from the repository root independently of the working directory. Generated reports default to the ignored workspace. Public documentation links target versioned instructions, with no current missing-item count/list. Ignore rules, syntax parsing, and `git diff --check` checked.
 - Python 3.12/Docker and live Discord rendering remain untested. No bot startup, live-resource changes, or deployment performed.
+- Browser exporter: 34 assertions pass with mocked browser/Portal responses in a JavaScript V8 isolate, covering fetch/XHR, generated JSON, ID precision, duplicates, invalid/unrelated/failed/paginated responses, cleanup, and timeout. Fixtures can also run with `node tests/test_emoji_exporter.cjs`; Node is unavailable in this environment. The live Portal UI has not been tested.
 
 ## Remaining work
 - Verify the actual target application's complete emoji inventory before planning uploads; mapping counts alone are unverified. Findings and capacity details remain in the local audit folder.
