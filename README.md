@@ -114,6 +114,11 @@ The offline runner blocks live network connections and fakes external services. 
 
 Reports are ignored by Git and regenerated on each run. Test failures produce a nonzero exit code; coverage reports are still written. For one module, run `python -m unittest tests.test_snapshot_reader -v`.
 
+GitHub Actions runs these tests on Python 3.12 for every push and pull request.
+Download coverage reports from the workflow's artifacts. See
+[CI setup in TESTING.md](TESTING.md#continuous-integration) for making the test
+check required before merging into `main`.
+
 See [TESTING.md](TESTING.md) for test scope and coverage limitations, [DOCS.md](DOCS.md) for command details, and [DATA_FLOW_ARCHITECTURE.md](DATA_FLOW_ARCHITECTURE.md) for pipeline design. [PROJECT_STATUS.md](PROJECT_STATUS.md) records current implementation decisions and remaining work.
 
 ## Repository hygiene and contributing

@@ -10,6 +10,22 @@ connections are blocked by the report runner: an accidentally unmocked network
 call fails locally. Tests that construct the application replace `.env` loading
 and supply fake environment values.
 
+## Continuous integration
+
+The `CI` GitHub Actions workflow runs on every push and pull request, and can
+also be started manually from the Actions tab. It installs `requirements-dev.txt`
+on Python 3.12 and runs the same offline test runner used locally. Coverage
+reports are uploaded as the `coverage-python-3.12` artifact for 14 days, including
+when tests fail and reports are available. CI needs no repository secrets, so
+fork pull requests can run it; GitHub may require maintainer approval for
+first-time contributors' workflow runs.
+
+To prevent merging failing changes, configure a GitHub branch ruleset or branch
+protection rule for `main` that requires pull requests and the
+`Tests (Python 3.12)` status check after the workflow has run once. Adding the
+workflow alone does not enforce merge protection. The existing deployment
+workflow still runs independently on pushes to `main`.
+
 ## What is tested
 
 | Area | Behavior checked |
