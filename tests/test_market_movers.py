@@ -108,6 +108,7 @@ class MarketMoverEmbedTests(unittest.TestCase):
         self.assertIn("1,234,567", cells[1])
         self.assertIn("35", cells[1])
         self.assertIn(market.EMOJIS["green-up"], lines[1])
+        self.assertTrue(all(line.startswith('📦 `') for line in lines[1:]))
         self.assertIn("not available", next(f.value for f in embed.fields if f.name == "Qty"))
         self.assertIn("Collection interval: 1h", next(f.value for f in embed.fields if f.name == "Comparison"))
         last, page, pages = market.create_movers_embed(self.data(), "exalted", "gainers", "currency", 999)
@@ -122,6 +123,16 @@ class MarketMoverEmbedTests(unittest.TestCase):
         self.assertIn("-50.00%", embed.description)
         self.assertIn(market.EMOJIS["red-down"], embed.description)
         self.assertIn("—", embed.description)
+
+    def test_unique_rankings_have_plain_item_rows_and_header(self):
+        item = record(item_kind='unique', category='accessory', api_id='headhunter', name='Headhunter')
+        data = observations([item | {'current_price': 20}], [item])
+        embed, _, _ = market.create_movers_embed(data, 'exalted', 'gainers', 'unique', 0)
+        lines = embed.description.splitlines()
+        self.assertEqual(len(lines), 2)
+        self.assertTrue(lines[0].startswith('`Item'))
+        self.assertTrue(lines[1].startswith('`Headhunter'))
+        self.assertNotIn('📦', embed.description)
 
     def test_prices_and_changes_use_fixed_reference_without_divine_conversion(self):
         data = observations([record(current_price=200), record(api_id="divine", current_price=100)],

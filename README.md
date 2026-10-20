@@ -61,6 +61,32 @@ Startup connects to Discord, registers event handlers, and syncs slash commands 
 
 Emoji mappings are versioned in `bot/util/item_emojis.json`; restart the bot after editing them.
 
+## Item emoji behavior
+
+Both market commands keep unmapped exchange items visible using the configurable
+`default-item` emoji (📦). Unique and non-exchange item rows have no item emoji
+or placeholder; price-reference markers and change indicators remain. Large
+legacy `/poe2scout` results stop at whole rows within Discord's description limit
+and point to `/market-menu` for full pagination.
+
+## Checking emoji coverage
+
+Contributors can check NPC currency-exchange items against the runtime mapping:
+
+```bash
+python tools/audit_item_emojis.py --league "Runes of Aldur"
+```
+
+This fetches the public catalogue, prints a local summary, and writes the list
+to `emoji_audit/reports/missing-item-emojis.json`. The folder is created as
+needed and ignored by Git. No bot token is needed and no Discord changes are
+made. Use `--input path/to/items.json` to check a saved catalogue offline.
+
+Audit/download scripts, tests, and usage instructions are versioned. Generated
+reports, counts, downloaded icons, and session findings stay local in
+`emoji_audit/`; do not commit them. See [DOCS.md](DOCS.md#emoji-maintenance)
+for download and capacity options. The bot never reads the audit reports.
+
 ## Docker
 
 With `.env` configured:
@@ -97,7 +123,7 @@ See [TESTING.md](TESTING.md) for test scope and coverage limitations, [DOCS.md](
 
 ## Repository hygiene and contributing
 
-Git ignores local environment files, credentials under `.aws/`, virtual environments, Python caches, coverage reports, downloaded `icons/`, root `output.json`, logs, editor settings, and local agent state. Shared instructions (`AGENTS.md`), tests, documentation, and emoji mappings remain versionable. Placeholder-only `.env.example` files are allowed.
+Git ignores local environment files, credentials under `.aws/`, virtual environments, Python caches, coverage reports, the local `emoji_audit/` workspace, downloaded `icons/`, root `output.json`, logs, editor settings, and local agent state. Shared instructions (`AGENTS.md`), runtime tests, shared documentation, and emoji mappings remain versionable. Placeholder-only `.env.example` files are allowed.
 
 Before committing, review `git status --short`, `git diff`, and `git diff --cached`. Ignore rules do not remove files already tracked by Git or erase earlier commits; keep credentials out of source and documentation.
 
@@ -118,4 +144,3 @@ and does not promise an automatic log-retention limit.
 ## License
 
 [MIT](LICENSE).
-

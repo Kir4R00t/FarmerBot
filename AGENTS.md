@@ -10,6 +10,8 @@
 - `README.md` and `DOCS.md`: setup and usage; `DATA_FLOW_ARCHITECTURE.md`: data pipeline design. Check code before assuming documentation describes implemented behavior.
 
 ## Collaboration
+- At the start of every session, check the current Git branch and work on `dev` by default. If needed, switch to the existing `dev` branch (or create it tracking `origin/dev`) before making project changes. Preserve any uncommitted work; do not discard it to switch branches.
+- Never work directly on `main` unless the user explicitly instructs you to do so for the current task. General permission to implement, commit, or push changes does not authorize working on `main`.
 - The user is learning agentic coding. Briefly explain consequential choices and how changes are verified.
 - Read `PROJECT_STATUS.md` when starting a new session. Verify its claims against relevant code before relying on them.
 - Keep changes focused on the requested task and follow nearby code conventions.
@@ -29,6 +31,14 @@
 - Never print or commit `.env` contents, tokens, or cloud credentials. Use variable names or placeholders in documentation.
 - Local bot startup (`python -m bot.main`) connects to Discord and can trigger event handlers. Prefer offline verification unless a live run is requested.
 - Do not deploy, push, or change live Discord/cloud resources unless the task authorizes it.
+
+## Emoji maintenance and release scope
+- Item emojis are only for NPC currency-exchange items. Exclude unique equipment and other non-exchange items from audits, downloads, and upload budgets; their market rows have no item emoji or fallback placeholder. Keep price-reference currency markers and change indicators. Use PoE2Scout's `CurrencyCategories` boundary, not merely a nonempty API ID; review the shared category allowlist when upstream categories change.
+- Keep reusable emoji audit/download scripts, their dedicated tests, and neutral usage instructions versioned so contributors can run checks themselves. Keep generated reports, missing-item counts/lists, saved catalogues, downloaded icons, and session findings local-only under Git-ignored `emoji_audit/`; do not force-add them or publish current audit findings in shared documentation. Tools may be included in a future release to `main`; this does not authorize editing or publishing `main`.
+- Download emoji PNGs using lowercase names with underscores between words, matching the bot's Discord emoji naming convention. Preserve exact full API IDs as JSON mapping keys; uploaded emoji names and mapping keys serve different purposes.
+- Runtime emoji mappings, the default emoji/fallback behavior, and relevant bot tests may be proposed for `main` so the deployed bot can use them. The runtime must not depend on the audit or downloader.
+- Before recommending emoji uploads, check the current Discord quota for the actual target (application versus server), count distinct uploaded emoji IDs rather than JSON mapping keys, and include unused uploads in that target's inventory. Reused emoji references and the Unicode fallback consume no new slots. Label mapping-only capacity estimates as unverified; never treat them as a live inventory check.
+- When preparing a release, include runtime changes and reusable maintenance tools/tests/instructions as appropriate, while keeping generated audit results local. Preserve test imports and documentation links when selecting changes. This preference does not authorize editing `main`, publishing, or deleting helper scripts already present there.
 
 ## Session handoff
 - At the end of meaningful project work, update `PROJECT_STATUS.md` with decisions, verification results, and remaining tasks.

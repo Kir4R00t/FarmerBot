@@ -54,8 +54,8 @@ by function. Coverage includes every Python module under `bot`, including the
 namespace directory `bot/services`. No executable bot functions are omitted and
 there are no custom coverage exclusions. Coverage.py's defaults exclude the
 type-only `S3Client` Protocol declaration; the real reader implementation is
-fully measured. Utility scripts under `helpful_scripts` and test
-tooling itself are outside the bot coverage scope.
+fully measured. The maintenance scripts and test tooling itself are outside the bot coverage
+scope.
 
 Line coverage asks whether a statement ran. Branch coverage asks whether each
 control-flow outcome ran. The terminal's `Cover` column combines both; the XML
@@ -71,3 +71,20 @@ test invents an impossible filter result just to reach 100%.
 Live Discord permissions, network behavior, command synchronization against
 Discord, and actual cloud credentials are not verified by these offline tests.
 Those need a separate integration run with a dedicated test bot/server.
+
+## Emoji maintenance tests
+
+The versioned `tests/test_emoji_audit.py` and `tests/test_icon_downloader.py`
+run with the normal `python tools/run_tests.py` suite. They use synthetic
+catalogues and mocked downloads to check category exclusions, missing mappings,
+capacity boundaries, report output, safe filenames, existing-file preservation,
+and partial failures. No saved audit results or downloaded icons are needed;
+the ignored `emoji_audit/` folder may be absent in a fresh clone.
+
+The browser-console exporter has separate JavaScript fixtures:
+`node tests/test_emoji_exporter.cjs` (Node.js, no npm packages). They check both
+fetch and XHR capture, exact ID preservation, static/animated references,
+duplicate names, invalid data, unrelated/paginated/failed requests, cleanup,
+timeout, and JSON download contents. These tests simulate the browser and
+Portal responses; they do not verify the live Developer Portal UI. They are
+separate from the Python offline suite and bot coverage report.
