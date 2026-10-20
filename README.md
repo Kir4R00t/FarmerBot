@@ -2,6 +2,8 @@
 
 Python Discord bot for [xfarmerx's Discord server](https://discord.com/invite/bsjQV4tFMf). The Docker runtime uses Python 3.12.
 
+See [CHANGELOG.md](CHANGELOG.md) for release notes.
+
 ## Commands and features
 
 - `/poe2scout <currency_type> <reference_currency>` queries poe2scout directly for currency prices. The league is currently hardcoded in `bot/commands/poe2scout.py`.

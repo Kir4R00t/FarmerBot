@@ -40,6 +40,12 @@
 - Before recommending emoji uploads, check the current Discord quota for the actual target (application versus server), count distinct uploaded emoji IDs rather than JSON mapping keys, and include unused uploads in that target's inventory. Reused emoji references and the Unicode fallback consume no new slots. Label mapping-only capacity estimates as unverified; never treat them as a live inventory check.
 - When preparing a release, include runtime changes and reusable maintenance tools/tests/instructions as appropriate, while keeping generated audit results local. Preserve test imports and documentation links when selecting changes. This preference does not authorize editing `main`, publishing, or deleting helper scripts already present there.
 
+## Changelog and versions
+- Every merge into `main` must include a `CHANGELOG.md` update in the same PR, with a new version, PR title, and concise change bullets. Include documentation-only updates and hotfixes. Merging `main` into `dev` is not a release.
+- Start at `0.1.0`. Increment the patch number for smaller updates (fixes, mappings, maintenance, documentation, small improvements); increment the minor number and reset patch to zero for substantial features or breaking changes. Choose based on the largest included change and describe any required user action. Reserve `1.0.0` for an explicit stable-release decision.
+- Keep `CHANGELOG.md` compact: each entry is a `# [VERSION]/PR title` heading followed by short Added/Fixed/Changed/Removed bullets. Keep newest entries first; omit introductions, policy text, dates, and category subheadings. Maintain the next entry on `dev` and ensure its heading matches the final PR title before merging into `main`. Keep versioning rules here and generated audit findings local.
+- Updating the changelog does not authorize a merge, push, deployment, Git tag, or GitHub release.
+
 ## Session handoff
 - At the end of meaningful project work, update `PROJECT_STATUS.md` with decisions, verification results, and remaining tasks.
 - Keep that file short and current. Do not copy chat transcripts or secrets into it.
