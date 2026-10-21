@@ -6,7 +6,7 @@ from unittest.mock import Mock, patch
 
 import requests
 
-from helpful_scripts.get_currency_icons import icon_entries, icon_filename, main
+from tools.get_currency_icons import icon_entries, icon_filename, main
 
 
 PNG = b'\x89PNG\r\n\x1a\n' + b'test icon bytes'
@@ -42,7 +42,7 @@ class IconDownloaderTests(unittest.TestCase):
             folder.mkdir()
             legacy = folder / 'soul-core-of-cholotl.png'
             legacy.write_bytes(PNG)
-            with patch('helpful_scripts.get_currency_icons.requests.get') as get:
+            with patch('tools.get_currency_icons.requests.get') as get:
                 self.assertEqual(main([str(folder), '--report', str(report)]), 0)
                 get.assert_not_called()
             self.assertFalse(legacy.exists())
@@ -56,7 +56,7 @@ class IconDownloaderTests(unittest.TestCase):
             (root / 'new-rune.png').write_bytes(PNG + b'old')
             destination = root / 'new_rune.png'
             destination.write_bytes(PNG + b'current')
-            with patch('helpful_scripts.get_currency_icons.requests.get') as get:
+            with patch('tools.get_currency_icons.requests.get') as get:
                 self.assertEqual(main([str(root), '--report', str(report)]), 0)
                 get.assert_not_called()
             self.assertEqual(destination.read_bytes(), PNG + b'current')
@@ -88,7 +88,7 @@ class IconDownloaderTests(unittest.TestCase):
             ]}))
             folder = root / 'icons'
             args = [str(folder), '--report', str(report), '--category', 'runes', '--category', 'accessory']
-            with patch('helpful_scripts.get_currency_icons.requests.get', return_value=Mock(content=PNG)) as get:
+            with patch('tools.get_currency_icons.requests.get', return_value=Mock(content=PNG)) as get:
                 self.assertEqual(main(args), 0)
                 self.assertEqual((folder / 'new_rune.png').read_bytes(), PNG)
                 self.assertFalse((folder / 'hero_s_gift.png').exists())
@@ -105,7 +105,7 @@ class IconDownloaderTests(unittest.TestCase):
             folder = Path(directory)
             responses = [Mock(json=Mock(return_value=items)), requests.Timeout('timeout'),
                          Mock(content=b'<html>not an icon</html>'), Mock(content=PNG)]
-            with patch('helpful_scripts.get_currency_icons.requests.get', side_effect=responses):
+            with patch('tools.get_currency_icons.requests.get', side_effect=responses):
                 self.assertEqual(main([str(folder), 'https://example.com/Items']), 1)
             self.assertEqual([p.name for p in folder.iterdir()], ['valid.png'])
 
@@ -114,5 +114,5 @@ class IconDownloaderTests(unittest.TestCase):
             report = Path(directory) / 'report.json'
             report.write_text('<html>')
             self.assertEqual(main([directory, '--report', str(report)]), 1)
-            with patch('helpful_scripts.get_currency_icons.requests.get', side_effect=requests.Timeout):
+            with patch('tools.get_currency_icons.requests.get', side_effect=requests.Timeout):
                 self.assertEqual(main([directory, 'https://example.com/Items']), 1)

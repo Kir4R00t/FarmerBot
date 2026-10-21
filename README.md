@@ -97,7 +97,7 @@ With `.env` configured:
 docker compose up -d --build
 ```
 
-Compose passes `.env` into the container. The image copies the `bot/` package and installs runtime dependencies. The existing GitHub Actions workflow deploys on pushes to `main` using the configured VPS secrets; review `.github/workflows/deploy.yml` before pushing to that branch.
+Compose passes `.env` into the container. The image copies the `bot/` package and installs runtime dependencies. `.dockerignore` limits the build context to those runtime inputs, leaving local configuration, downloads, tests, and reports out of it. The existing GitHub Actions workflow deploys on pushes to `main` using the configured VPS secrets; review `.github/workflows/deploy.yml` before pushing to that branch.
 
 ## Automated tests and coverage
 

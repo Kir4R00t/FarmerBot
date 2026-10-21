@@ -152,7 +152,7 @@ if (typeof module !== "undefined") module.exports = { testEmojiExporter };
 if (typeof require === "function" && require.main === module) {
   const fs = require("node:fs");
   const path = require("node:path");
-  const source = fs.readFileSync(path.join(__dirname, "../helpful_scripts/export_application_emojis.js"), "utf8");
+  const source = fs.readFileSync(path.join(__dirname, "../tools/export_application_emojis.js"), "utf8");
   testEmojiExporter(source).then(checks => console.log(`Passed ${checks} emoji exporter assertions.`))
     .catch(error => { console.error(error); process.exitCode = 1; });
 }

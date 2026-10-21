@@ -6,7 +6,7 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-from bot.commands import pagination_test
+from bot.commands import pagination
 from bot.commands.poe2scout import CurrencyExchange
 from bot.util import emoji_loader
 
@@ -43,7 +43,7 @@ class EmojiLoaderTests(unittest.TestCase):
                 os.chdir(original_directory)
         for name in ("divine", "exalted", "chaos", "green-up", "red-down"):
             self.assertIsInstance(emojis[name], str)
-        self.assertEqual(pagination_test.EMOJIS, emojis)
+        self.assertEqual(pagination.EMOJIS, emojis)
 
     def test_full_api_keys_resolve_uploaded_names_with_accents_and_truncation(self):
         emojis = emoji_loader.load_item_emojis()

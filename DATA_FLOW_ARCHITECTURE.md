@@ -4,14 +4,14 @@
 
 This project uses Apache NiFi to collect PoE2Scout market data once per hour and Cloudflare R2 as its data lake. Each run preserves the original API responses and produces one normalized, analytics-ready `exchange-snapshot.json`.
 
-The pipeline currently stops after publishing the curated exchange snapshot to R2. PostgreSQL, arbitrage calculations, market-mover calculations, and Discord commands that consume the new snapshot format are later phases.
+The collection pipeline publishes curated exchange snapshots to R2. FarmerBot already reads those snapshots directly for `/market-menu`, including category prices, pagination, top gainers, and top losers. PostgreSQL and arbitrage calculations remain planned work; the bot does not implement the NiFi collector itself.
 
 ## Technology choices
 
 - **Apache NiFi:** extraction, orchestration, rate limiting, pagination, normalization, and snapshot assembly.
 - **Cloudflare R2:** private S3-compatible data lake containing raw, normalized, and curated objects.
 - **PostgreSQL:** planned data warehouse for query-ready analytics.
-- **FarmerBot:** Discord consumer. During the current transition it can read curated snapshots directly from R2.
+- **FarmerBot:** implemented Discord consumer, reading curated snapshots directly from R2 and calculating market movers in process.
 
 ## NiFi processor names
 
@@ -158,6 +158,7 @@ name
 reference_currency
 current_price
 current_quantity
+price_observed_at (optional)
 source_page
 ```
 
@@ -176,23 +177,23 @@ def attr = { String name ->
 ```
 
 
-## Planned analytics and warehouse phase
+## Bot analytics and planned warehouse phase
 
-The curated snapshot is the input for two later transformations:
+Curated snapshots already feed the bot's market browser and market-mover calculations. They can also support future warehouse and arbitrage work.
 
 ### Market movers
 
-Compare matching items between consecutive snapshots:
+`bot/services/market_movers.py` compares matching items from the latest two eligible snapshots, using the selected reference currency:
 
 ```text
 change_percent = ((price_new - price_old) / price_old) * 100
 ```
 
-Filter or flag missing prices and insufficient quantity, then rank positive changes as gainers and negative changes as losers.
+The implemented ranking excludes missing or invalid prices, nonpositive previous prices, unmatched identities, and ambiguous duplicates. It ranks positive changes as gainers and negative changes as losers, and separates currency items from uniques. The Discord views show comparison times and recorded quantity as **Qty**; no minimum-quantity filter is imposed, and this field is not verified trading volume. See [current command behavior](DOCS.md#top-gainers-and-top-losers).
 
 ### Arbitrage
 
-Evaluate complete exchange cycles across exalted, chaos, divine, and an intermediate item:
+Arbitrage is not implemented. A future design could evaluate complete exchange cycles across exalted, chaos, divine, and an intermediate item:
 
 ```text
 route_factor = rate(A -> B) * rate(B -> C) * rate(C -> A)
@@ -200,6 +201,6 @@ theoretical_profit_percent = (route_factor - 1) * 100
 bottleneck_volume = minimum liquidity across every route leg
 ```
 
-Apply configurable safety-margin and minimum-volume rules before publishing an opportunity.
+This would require verified directional quotes, liquidity/volume semantics, and configurable safety margins before publishing an opportunity. Current snapshot reference prices and `current_quantity` alone do not establish executable trades.
 
-PostgreSQL will eventually hold normalized results such as `market_movers` and `arbitrage_routes`. The Discord bot can then query PostgreSQL for low-latency analytics while R2 remains the durable historical data lake.
+PostgreSQL is a planned home for normalized results such as `market_movers` and `arbitrage_routes`. No PostgreSQL reader or warehouse writer is implemented in this repository. The bot currently reads R2 directly; R2 remains the durable historical data lake in this design.

@@ -88,3 +88,7 @@ duplicate names, invalid data, unrelated/paginated/failed requests, cleanup,
 timeout, and JSON download contents. These tests simulate the browser and
 Portal responses; they do not verify the live Developer Portal UI. They are
 separate from the Python offline suite and bot coverage report.
+
+The icon downloader and browser exporter live in `tools/get_currency_icons.py`
+and `tools/export_application_emojis.js`; there is no separate local test runner
+under `emoji_audit/`.

@@ -7,6 +7,7 @@
 - `bot/events/`: Discord event handlers.
 - `bot/services/r2_snapshot_reader.py`: synchronous Cloudflare R2 snapshot reader.
 - `bot/services/market_movers.py`: Discord-independent gainers/losers ranking. `current_quantity` is not verified trading volume; keep the UI label `Qty` until its upstream meaning is established.
+- `tools/`: supported test runner, emoji audit/downloader, and browser-console emoji exporter. Keep generated material under ignored local workspaces.
 - `README.md` and `DOCS.md`: setup and usage; `DATA_FLOW_ARCHITECTURE.md`: data pipeline design. Check code before assuming documentation describes implemented behavior.
 
 ## Collaboration
@@ -15,6 +16,7 @@
 - The user is learning agentic coding. Briefly explain consequential choices and how changes are verified.
 - Read `PROJECT_STATUS.md` when starting a new session. Verify its claims against relevant code before relying on them.
 - Keep changes focused on the requested task and follow nearby code conventions.
+- Keep documentation current; do not retain archived investigations, old audit runs, or session-review notes in the repository workspace. Keep active inputs/assets and the required release changelog.
 - Make routine, reversible implementation decisions independently. Ask when missing requirements materially change behavior or scope.
 
 ## Implementation and verification
@@ -48,4 +50,5 @@
 
 ## Session handoff
 - At the end of meaningful project work, update `PROJECT_STATUS.md` with decisions, verification results, and remaining tasks.
+- Preserve a changelog reminder and a link to this file's `Changelog and versions` section in `PROJECT_STATUS.md` when refreshing or shortening the handoff.
 - Keep that file short and current. Do not copy chat transcripts or secrets into it.

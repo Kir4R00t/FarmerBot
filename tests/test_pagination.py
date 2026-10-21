@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 
 import discord
 
-from bot.commands import pagination_test as market
+from bot.commands import pagination as market
 from bot.services.r2_snapshot_reader import SnapshotConfigurationError, SnapshotStorageError
 from tests.support import NOW, bot, interaction, record, snapshot, run_in_test_thread
 
@@ -90,7 +90,7 @@ class MarketDataTests(unittest.TestCase):
         embed, page, count = market.create_category_embed([current, previous], group, "exalted", 100)
         self.assertEqual((page, count), (0, 1))
         self.assertIn("*Sword*  2`", embed.description)
-        self.assertIn("`0.00%`", embed.description)  # 2 divines in both snapshots.
+        self.assertIn("`+0.00%`", embed.description)  # 2 divines in both snapshots.
         self.assertIn("`*Sword*", embed.description)
         self.assertIn("Compared with", [f.name for f in embed.fields])
         no_rate, _, _ = market.create_category_embed([current, snapshot()], group, "exalted", 0)
@@ -98,7 +98,7 @@ class MarketDataTests(unittest.TestCase):
 
     def test_category_embeds_show_increase_decrease_and_missing_history(self):
         group = market.CategoryGroup("currency", "currency", "Currency")
-        for old, new, expected in ((10, 15, "+50.00%"), (10, 5, "-50.00%"), (10, 10, "0.00%")):
+        for old, new, expected in ((10, 15, "+50.00%"), (10, 5, "-50.00%"), (10, 10, "+0.00%")):
             with self.subTest(old=old, new=new):
                 embed, _, _ = market.create_category_embed([snapshot(record(current_price=new)), snapshot(record(current_price=old))], group, "exalted", 0)
                 self.assertIn(expected, embed.description)
@@ -108,6 +108,19 @@ class MarketDataTests(unittest.TestCase):
         self.assertIn("No priced items", empty.description)
         self.assertEqual((page, pages), (0, 1))
         self.assertIn("Items 0–0 of 0", empty.footer.text)
+
+    def test_tiny_changes_show_neutral_emoji_and_zero_percent(self):
+        group = market.CategoryGroup("currency", "currency", "Currency")
+        for current_price in (100, 99.999, 100.001):
+            with self.subTest(current_price=current_price):
+                embed, _, _ = market.create_category_embed(
+                    [snapshot(record(current_price=current_price)),
+                     snapshot(record(current_price=100))],
+                    group, "exalted", 0,
+                )
+                self.assertTrue(embed.description.endswith(
+                    f"{market.EMOJIS['heavy-equals-sign']} `+0.00%`"
+                ), embed.description)
 
     def test_category_pagination_clamps_and_shows_last_page(self):
         records = [record(name=f"Item {i}", api_id=f"item-{i}", current_price=i + 1) for i in range(16)]
@@ -286,7 +299,7 @@ class MarketCommandTests(unittest.IsolatedAsyncioTestCase):
         self.client = bot()
         self.addAsyncCleanup(self.client.close)
         self.reader = Mock()
-        self.command = market.PaginationTest(self.client, self.reader)
+        self.command = market.Pagination(self.client, self.reader)
         self.callback = self.client.tree.get_command("market-menu").callback
 
     async def test_success_loads_two_snapshots_and_sends_menu(self):

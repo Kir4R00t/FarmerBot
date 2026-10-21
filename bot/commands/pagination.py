@@ -483,7 +483,9 @@ def create_category_embed(
                 f"{EMOJIS.get('red-down', '▼')} `{change:.2f}%`"
             )
         else:
-            change_display = "= `0.00%`"
+            change_display = (
+                f"{EMOJIS.get('heavy-equals-sign', '=')} `+0.00%`"
+            )
 
         item_emoji = _item_emoji(record)
         prefix = f"{item_emoji} " if item_emoji else ""
@@ -1046,7 +1048,7 @@ class MarketPageView(OwnedView):
         await interaction.response.edit_message(embed=view.create_embed(), view=view)
 
 
-class PaginationTest:
+class Pagination:
     def __init__(
         self,
         client: commands.Bot,
@@ -1130,7 +1132,7 @@ class PaginationTest:
 
 __all__ = [
     "CategoryGroup",
-    "PaginationTest",
+    "Pagination",
     "calculate_price_change",
     "create_category_embed",
     "discover_category_groups",

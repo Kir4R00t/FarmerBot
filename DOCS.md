@@ -23,7 +23,7 @@ requirements:
 
 ```bash
 python tools/audit_item_emojis.py --league 'Runes of Aldur'
-python helpful_scripts/get_currency_icons.py emoji_audit/icons/missing-soul-cores --report emoji_audit/reports/missing-item-emojis.json --category ultimatum
+python tools/get_currency_icons.py emoji_audit/icons/missing-soul-cores --report emoji_audit/reports/missing-item-emojis.json --category ultimatum
 ```
 
 The audit creates `emoji_audit/reports/missing-item-emojis.json`. This report,
@@ -70,7 +70,7 @@ external services faked and network connections blocked.
 
 Open your application's **Emojis** page in the Discord Developer Portal, open
 the browser developer tools **Console**, and paste the entire contents of
-[`helpful_scripts/export_application_emojis.js`](helpful_scripts/export_application_emojis.js).
+[`tools/export_application_emojis.js`](tools/export_application_emojis.js).
 Switch to **General Information**, then back to **Emojis** without reloading the
 page. The script watches the next successful full emoji-list response and
 downloads `application-emojis-APPLICATION_ID.json`. This reads the Portal's

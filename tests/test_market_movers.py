@@ -2,7 +2,7 @@ from datetime import timedelta
 import math
 import unittest
 
-from bot.commands import pagination_test as market
+from bot.commands import pagination as market
 from bot.services.market_movers import rank_market_movers
 from tests.support import NOW, interaction, record, snapshot
 
