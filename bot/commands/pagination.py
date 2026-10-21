@@ -483,7 +483,9 @@ def create_category_embed(
                 f"{EMOJIS.get('red-down', '▼')} `{change:.2f}%`"
             )
         else:
-            change_display = "= `0.00%`"
+            change_display = (
+                f"{EMOJIS.get('heavy-equals-sign', '=')} `+0.00%`"
+            )
 
         item_emoji = _item_emoji(record)
         prefix = f"{item_emoji} " if item_emoji else ""
