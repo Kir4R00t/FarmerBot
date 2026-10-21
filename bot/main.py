@@ -3,7 +3,7 @@ from discord.ext import commands    # type: ignore
 import discord                      # type: ignore
 import os
 
-from bot.commands import poe2scout, catAPI, pagination_test
+from bot.commands import poe2scout, catAPI, pagination
 from bot.events import on_message_actions, on_ready
 
 class BotApp():
@@ -20,7 +20,7 @@ class BotApp():
         catAPI.CatApi(self.bot)
         on_message_actions.OnMessageActions(self.bot)
         on_ready.OnReady(self.bot)
-        pagination_test.PaginationTest(self.bot)
+        pagination.Pagination(self.bot)
 
     
     def run(self):

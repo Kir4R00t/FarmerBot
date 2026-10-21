@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 
 import discord
 
-from bot.commands import pagination_test as market
+from bot.commands import pagination as market
 from bot.services.r2_snapshot_reader import SnapshotConfigurationError, SnapshotStorageError
 from tests.support import NOW, bot, interaction, record, snapshot, run_in_test_thread
 
@@ -286,7 +286,7 @@ class MarketCommandTests(unittest.IsolatedAsyncioTestCase):
         self.client = bot()
         self.addAsyncCleanup(self.client.close)
         self.reader = Mock()
-        self.command = market.PaginationTest(self.client, self.reader)
+        self.command = market.Pagination(self.client, self.reader)
         self.callback = self.client.tree.get_command("market-menu").callback
 
     async def test_success_loads_two_snapshots_and_sends_menu(self):

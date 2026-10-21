@@ -1046,7 +1046,7 @@ class MarketPageView(OwnedView):
         await interaction.response.edit_message(embed=view.create_embed(), view=view)
 
 
-class PaginationTest:
+class Pagination:
     def __init__(
         self,
         client: commands.Bot,
@@ -1130,7 +1130,7 @@ class PaginationTest:
 
 __all__ = [
     "CategoryGroup",
-    "PaginationTest",
+    "Pagination",
     "calculate_price_change",
     "create_category_embed",
     "discover_category_groups",
